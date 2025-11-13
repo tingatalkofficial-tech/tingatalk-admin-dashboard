@@ -1,12 +1,42 @@
 import React, { useState } from 'react';
-import { useDashboard } from '../../context/DashboardContext';
 import MenuItem from './MenuItem';
 import PromoCard from './PromoCard';
 import Logo from './Logo';
 
+interface MenuItemType {
+  id: string;
+  label: string;
+  icon: string;
+  path: string;
+  isActive: boolean;
+}
+
 const Sidebar: React.FC = () => {
-  const { menuItems } = useDashboard();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const menuItems: MenuItemType[] = [
+    {
+      id: '1',
+      label: 'Analytics',
+      icon: '📊',
+      path: '/analytics',
+      isActive: window.location.pathname === '/analytics'
+    },
+    {
+      id: '2',
+      label: 'Users',
+      icon: '👥',
+      path: '/users',
+      isActive: window.location.pathname.startsWith('/users')
+    },
+    {
+      id: '3',
+      label: 'Calls',
+      icon: '📞',
+      path: '/calls',
+      isActive: window.location.pathname === '/calls'
+    }
+  ];
 
   return (
     <>
