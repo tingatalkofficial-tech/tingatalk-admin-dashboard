@@ -1,128 +1,122 @@
-# Firebase Setup Guide for Analytics Dashboard
+# Firebase Setup Guide
 
-## ✅ What's Already Done
+## Prerequisites
 
-1. **Firebase CLI Connected** - Project: tingatalk-53057
-2. **Frontend Components Built** - All analytics UI components ready
-3. **Firebase SDK Integrated** - Analytics service created
-4. **Firestore Structure Mapped** - Based on your collections
+- Firebase account
+- Firebase project created
+- Firestore database enabled
 
-## 🔧 What You Need to Do
-
-### Step 1: Get Firebase Web App Configuration
+## Step 1: Get Firebase Configuration
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Select your project: **tingatalk-53057**
-3. Click the gear icon ⚙️ > **Project Settings**
-4. Scroll down to **Your apps** section
-5. If you don't have a web app, click **Add app** > **Web** (</>) icon
-6. Copy the `firebaseConfig` object
+2. Select your project (tingatalk-53057)
+3. Click the gear icon → Project settings
+4. Scroll to "Your apps" section
+5. Click the web app icon (</>)
+6. Copy the configuration values
 
-### Step 2: Update .env File
+## Step 2: Configure Environment Variables
 
-Open the `.env` file in your project root and replace the placeholder values:
+Create a `.env` file in the project root:
 
 ```env
-VITE_FIREBASE_API_KEY=your_actual_api_key
+VITE_FIREBASE_API_KEY=AIzaSy...
 VITE_FIREBASE_AUTH_DOMAIN=tingatalk-53057.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=tingatalk-53057
-VITE_FIREBASE_STORAGE_BUCKET=tingatalk-53057.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_actual_sender_id
-VITE_FIREBASE_APP_ID=your_actual_app_id
+VITE_FIREBASE_STORAGE_BUCKET=tingatalk-53057.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=462676704637
+VITE_FIREBASE_APP_ID=1:462676704637:web:...
 ```
 
-### Step 3: Restart Development Server
+## Step 3: Firestore Database Structure
 
-After updating .env:
+The app expects the following collections:
+
+### Required Collections:
+- `admin_analytics` - Analytics data
+  - `user_stats` - User statistics
+  - `financial_stats` - Financial metrics
+  - `call_stats` - Call statistics
+- `users` - User profiles
+- `male_users_admin` - Male user details
+- `female_users_admin` - Female user details
+- `rankings` - Top performers
+  - `by_rating` - Top rated users
+
+### User Subcollections:
+- `users/{userId}/callLogs` - Individual call logs
+
+## Step 4: Firestore Security Rules
+
+Update your Firestore rules (firestore.rules):
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Admin analytics - read only
+    match /admin_analytics/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    // Users - read only for admin
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if false;
+      
+      match /callLogs/{callId} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+    
+    // Admin collections - read only
+    match /{collection}/{document=**} {
+      allow read: if collection in ['male_users_admin', 'female_users_admin', 'rankings'];
+      allow write: if false;
+    }
+  }
+}
+```
+
+## Step 5: Deploy Rules
+
 ```bash
-# Stop the current dev server (Ctrl+C)
+firebase deploy --only firestore:rules
+```
+
+## Step 6: Test Connection
+
+Start the development server:
+```bash
 npm run dev
 ```
 
-## 📊 Firestore Collections Used
+Navigate to the Analytics page. If you see data, Firebase is configured correctly!
 
-The analytics dashboard reads from these collections:
-
-### 1. `users` Collection
-- **Document ID**: user_[timestamp]_[phone]
-- **Fields Used**:
-  - `displayName` (string) - User's display name
-  - `gender` (string) - "male" or "female"
-  - `profileImage` (string, optional) - Avatar URL
-
-### 2. `femal_earnings` Collection
-- **Document ID**: user_[timestamp]_[phone] (matches user ID)
-- **Fields Used**:
-  - `totalEarnings` (number) - Total INR earned
-  - `totalCalls` (number) - Total calls attended
-  - `totalAudioCalls` (number) - Audio calls count
-  - `rating` (number) - User rating (0-10)
-  - `availableBalance` (number) - Current balance
-  - `claimedAmount` (number) - Amount claimed
-
-### 3. `favourite_counts` Collection (Optional)
-- **Document ID**: user_[timestamp]_[phone]
-- **Fields Used**:
-  - `count` (number) - Number of favorites
-
-## 📈 Analytics Calculated
-
-### Revenue Metrics
-1. **Total Earnings** - Sum of all `totalEarnings` from `femal_earnings`
-2. **Audio Call Earnings** - Calculated from audio call ratio
-3. **Video Call Earnings** - Calculated from video call ratio
-4. **Coin Purchase Revenue** - Platform fee (10% of total earnings)
-
-### Call Statistics
-1. **Total Calls** - Sum of all `totalCalls`
-2. **Audio Calls** - Sum of all `totalAudioCalls`
-3. **Video Calls** - Total calls minus audio calls
-
-### User Statistics
-1. **Total Users** - Count of all documents in `users`
-2. **Male Users** - Count where `gender === "male"`
-3. **Female Users** - Count where `gender === "female"`
-
-### Top Performers
-1. **Top 3 Earners** - Sorted by `totalEarnings` (descending)
-2. **Top 3 Rated** - Sorted by `rating` (descending)
-3. **Top 3 Most Calls** - Sorted by `totalCalls` (descending)
-
-## 🔒 Security Notes
-
-1. **Firestore Rules** - Already configured for read-only access
-2. **Environment Variables** - Never commit `.env` to git
-3. **Authentication** - Consider adding Firebase Auth for admin access
-
-## 🐛 Troubleshooting
-
-### Error: "Permission denied"
-- Check Firestore rules allow read access
-- Ensure you're authenticated if rules require it
+## Troubleshooting
 
 ### Error: "Firebase not initialized"
-- Verify `.env` file has correct values
-- Restart dev server after changing `.env`
+- Check that `.env` file exists
+- Verify all environment variables are set
+- Restart the development server
 
-### Data not showing
-- Check Firebase Console to verify data exists
-- Open browser console to see error messages
-- Click "Refresh" button in the dashboard
+### Error: "Permission denied"
+- Check Firestore security rules
+- Ensure collections exist in Firestore
 
-## 🚀 Next Steps
+### Error: "No data showing"
+- Verify collections exist in Firestore
+- Check that documents have data
+- Open browser console for detailed errors
 
-1. **Add Authentication** - Secure admin access
-2. **Real-time Updates** - Use Firestore listeners instead of manual refresh
-3. **Date Filters** - Add date range selection for analytics
-4. **Export Data** - Add CSV/PDF export functionality
-5. **Charts** - Add visual charts for trends
+## Firebase Project Info
 
-## 📝 Pricing Model Reference
+- **Project ID**: tingatalk-53057
+- **Region**: Default (us-central)
+- **Database**: (default)
 
-- **Audio Calls**:
-  - Male pays: 0.15 coins/second
-  - Female earns: 0.1 INR/second
-  
-- **Video Calls**:
-  - Male pays: 0.8 coins/second
-  - Female earns: 0.8 INR/second
+## Support
+
+For Firebase-specific issues, check the [Firebase Documentation](https://firebase.google.com/docs).

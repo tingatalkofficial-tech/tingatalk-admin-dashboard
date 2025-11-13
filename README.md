@@ -1,196 +1,91 @@
-# COINEST - Financial Dashboard
+# TingaTalk Admin Dashboard
 
-A modern, fully responsive financial dashboard built with React, TypeScript, and Tailwind CSS. Features a beautiful UI with comprehensive financial tracking, savings plans, and analytics.
+A comprehensive admin dashboard for managing the TingaTalk dating and calling application. Built with React, TypeScript, and Firebase.
 
-## 🚀 Quick Start
+## Features
 
+- **Analytics Dashboard**: Real-time metrics for revenue, calls, and user statistics
+- **User Management**: Detailed views for male and female users with comprehensive data
+- **Call Management**: Track call statistics and view individual user call logs
+- **Firebase Integration**: Real-time data synchronization with Firestore
+- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
+
+## Tech Stack
+
+- **Frontend**: React 18 + TypeScript + Vite
+- **Styling**: Tailwind CSS
+- **Backend**: Firebase (Firestore, Authentication)
+- **State Management**: React Context API
+- **Routing**: React Router v6
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 16+ and npm
+- Firebase account with Firestore enabled
+- Git
+
+### Installation
+
+1. Clone the repository:
 ```bash
-# Install dependencies
+git clone https://github.com/tingatalkofficial-tech/tingatalk-admin-dashboard.git
+cd tingatalk-admin-dashboard
+```
+
+2. Install dependencies:
+```bash
 npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
 ```
 
-The development server will start at `http://localhost:5173/`
+3. Configure Firebase:
+   - Copy `.env.example` to `.env`
+   - Add your Firebase configuration values
+   - See `FIREBASE_SETUP_GUIDE.md` for detailed instructions
 
-## 🛠️ Tech Stack
-
-- **React** 18.2 - UI library
-- **TypeScript** 5.1 - Type safety
-- **Vite** 4.3 - Build tool
-- **Tailwind CSS** 3.3 - Styling
-- **Urbanist Font** - Typography
-
-## 📁 Project Structure
-
-```
-src/
-├── Assets/              # Images and static assets
-│   ├── logo.png        # COINEST logo
-│   └── reference images
-├── components/          # Reusable UI components
-│   ├── Card/           # Financial card components
-│   ├── DailyLimit/     # Daily spending limit
-│   ├── Header/         # Header with search and profile
-│   ├── SavingPlans/    # Savings plan components
-│   ├── Sidebar/        # Navigation sidebar
-│   └── Stats/          # Financial statistics
-├── context/            # React Context for state
-├── pages/              # Page components
-├── types/              # TypeScript type definitions
-├── page/               # Global styles
-└── App.tsx             # Root component
-```
-
-## ✨ Features
-
-### Core Functionality
-- 💳 **Financial Card** - Display balance, card details
-- 📊 **Statistics Dashboard** - Income, expenses, savings tracking
-- 💰 **Saving Plans** - Multiple savings goals with progress tracking
-- 📈 **Daily Limit** - Spending limit monitoring
-- ⚡ **Quick Actions** - Top-up, transfer, request, history
-
-### Responsive Design
-- 📱 **Mobile** (320px+) - Single column, hamburger menu
-- 📱 **Tablet** (640px-1023px) - Two-column layout
-- 💻 **Desktop** (1024px+) - Full layout with sidebar
-
-### UI/UX
-- 🎨 Modern, clean design
-- 🌈 Consistent color scheme
-- ✨ Smooth animations and transitions
-- 👆 Touch-optimized for mobile
-- ♿ Accessible components
-- 🎯 Intuitive navigation
-
-## 📱 Responsive Breakpoints
-
-| Device | Width | Layout |
-|--------|-------|--------|
-| Mobile | 320px - 639px | Single column, hidden sidebar |
-| Tablet | 640px - 1023px | Two columns, visible sidebar |
-| Desktop | 1024px+ | Fixed + flexible columns |
-
-## 🎨 Design System
-
-### Colors
-- **Background**: `#ecf4e9` (Light green)
-- **Content**: `#fbfbfc` (Off-white)
-- **Primary**: `#1e4841` (Dark green)
-- **Accent**: `#bbf49c` (Light green)
-- **Text**: `#232d2c` (Dark gray)
-
-### Typography
-- **Font**: Urbanist
-- **Weights**: 400, 500, 600, 700
-
-## 📖 Documentation
-
-Comprehensive documentation is available:
-
-- **[RESPONSIVE_DESIGN_GUIDE.md](./RESPONSIVE_DESIGN_GUIDE.md)** - Implementation details
-- **[RESPONSIVE_TESTING_CHECKLIST.md](./RESPONSIVE_TESTING_CHECKLIST.md)** - Testing guide
-- **[VISUAL_COMPARISON_GUIDE.md](./VISUAL_COMPARISON_GUIDE.md)** - Visual reference
-- **[RESPONSIVE_IMPLEMENTATION_SUMMARY.md](./RESPONSIVE_IMPLEMENTATION_SUMMARY.md)** - Summary
-
-## 🧪 Testing
-
-### Manual Testing
-1. Start dev server: `npm run dev`
-2. Open browser DevTools (F12)
-3. Enable device toolbar (Ctrl+Shift+M)
-4. Test at different breakpoints:
-   - 375px (iPhone)
-   - 768px (iPad)
-   - 1024px (Desktop)
-   - 1440px (Large Desktop)
-
-### What to Test
-- ✅ Mobile menu functionality
-- ✅ Layout responsiveness
-- ✅ Component rendering
-- ✅ Interactive elements
-- ✅ No horizontal scrolling
-- ✅ Logo display
-
-See [RESPONSIVE_TESTING_CHECKLIST.md](./RESPONSIVE_TESTING_CHECKLIST.md) for detailed testing steps.
-
-## 🏗️ Component Architecture
-
-### Context Provider
-- `DashboardContext` - Manages global state for dashboard data
-
-### Main Components
-- `Dashboard` - Main page layout
-- `Sidebar` - Navigation with mobile menu
-- `Header` - Search, notifications, user profile
-- `FinancialCard` - Card display with balance
-- `QuickActions` - Action buttons
-- `DailyLimit` - Spending limit tracker
-- `SavingPlans` - Savings goals
-- `FinancialStats` - Income/expense/savings stats
-
-## 🔧 Development
-
-### Code Style
-- TypeScript for type safety
-- Functional components with hooks
-- Tailwind CSS for styling
-- Mobile-first responsive design
-
-### Best Practices
-- Component modularity
-- Type definitions for all props
-- Consistent naming conventions
-- Clean, readable code
-- Proper error handling
-
-## 📦 Build
-
+4. Start development server:
 ```bash
-# Production build
-npm run build
-
-# Output directory: dist/
+npm run dev
 ```
 
-The build is optimized for production with:
-- Minified JavaScript
-- Optimized CSS
-- Asset optimization
-- Code splitting
+5. Open http://localhost:5173 in your browser
 
-## 🌐 Browser Support
+## Project Structure
 
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-- Mobile browsers (iOS Safari, Chrome Mobile)
+```
+tingatalk-admin-dashboard/
+├── src/
+│   ├── components/      # Reusable UI components
+│   ├── pages/          # Main application pages
+│   ├── services/       # Firebase and API services
+│   ├── types/          # TypeScript type definitions
+│   ├── utils/          # Utility functions
+│   └── context/        # React context providers
+├── public/             # Static assets
+└── firebase.json       # Firebase configuration
+```
 
-## 📄 License
+## Available Scripts
 
-This project was generated and enhanced for responsive design.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
 
-## 🤝 Contributing
+## Firebase Setup
 
-1. Follow the existing code style
-2. Test on all breakpoints
-3. Ensure no console errors
-4. Update documentation if needed
+See `FIREBASE_SETUP_GUIDE.md` for detailed Firebase configuration instructions.
 
-## 📞 Support
+## Documentation
 
-For issues or questions, refer to the documentation files or check the code comments.
+- `START_HERE.md` - Quick start guide
+- `FIREBASE_SETUP_GUIDE.md` - Firebase configuration guide
 
----
+## License
 
-**Built with ❤️ using React, TypeScript, and Tailwind CSS**
+Private - TingaTalk © 2025
+
+## Contact
+
+For support or inquiries, contact: tingatalkofficial@gmail.com
