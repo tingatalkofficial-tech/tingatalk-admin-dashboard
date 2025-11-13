@@ -1,0 +1,11 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read access for authenticated users (admin dashboard)
+    match /{document=**} {
+      allow read: if request.auth != null;
+      allow write: if false; // No writes from this admin dashboard
+    }
+  }
+}
