@@ -3,9 +3,9 @@ import logoImg from '../../Assets/logo.png';
 
 const Logo: React.FC = () => {
   return (
-    <div className="flex w-full -mx-[16px] -mt-[22px] mb-[10px]">
-      <div className="w-full bg-[#1e4841] rounded-[12px] py-[16px] px-[16px] flex items-center justify-center">
-        <img src={logoImg} alt="TingaTalk" className="h-[32px] w-auto object-contain" />
+    <div className="flex w-full px-[20px] py-[24px] items-center justify-center border-b border-[#1e4841]/10">
+      <div className="bg-[#1e4841] rounded-[10px] py-[12px] px-[20px] shadow-sm">
+        <img src={logoImg} alt="TingaTalk" className="h-[28px] w-auto object-contain" />
       </div>
     </div>
   );

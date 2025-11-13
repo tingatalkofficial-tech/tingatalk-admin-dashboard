@@ -56,8 +56,7 @@ const Sidebar: React.FC = () => {
 
       {/* Sidebar */}
       <aside className={`
-        flex flex-col gap-[20px] items-start bg-[#ecf4e9]
-        pt-[22px] pr-[16px] pb-[26px] pl-[16px]
+        flex flex-col bg-white shadow-lg
         
         /* Mobile: Fixed overlay */
         fixed lg:relative inset-0 z-40 lg:z-auto
@@ -65,18 +64,20 @@ const Sidebar: React.FC = () => {
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         
         /* Tablet & Desktop: Static sidebar */
-        w-[240px] md:w-[192px] lg:w-[192px]
+        w-[260px] md:w-[260px] lg:w-[260px]
         lg:min-h-screen
       `}>
         <Logo />
         
-        <nav className="flex w-full flex-col gap-[8px] items-start grow">
+        <nav className="flex w-full flex-col px-[16px] py-[20px] gap-[4px] flex-1">
           {menuItems.map((item) => (
             <MenuItem key={item.id} item={item} />
           ))}
         </nav>
 
-        <PromoCard />
+        <div className="px-[16px] pb-[20px]">
+          <PromoCard />
+        </div>
       </aside>
 
       {/* Mobile Overlay */}

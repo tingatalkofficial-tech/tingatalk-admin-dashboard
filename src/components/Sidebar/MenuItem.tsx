@@ -18,26 +18,28 @@ const MenuItem: React.FC<MenuItemProps> = ({ item }) => {
     }
   };
   
-  const baseClasses = "flex pt-[8px] pr-[12px] pb-[8px] pl-[16px] gap-[12px] items-center w-full rounded-[24px] cursor-pointer transition-colors";
-  const activeClasses = isActive ? "bg-[#bbf49c]" : "hover:bg-[#d4e8c8]";
+  const baseClasses = "flex py-[12px] px-[16px] gap-[12px] items-center w-full rounded-[10px] cursor-pointer transition-all duration-200";
+  const activeClasses = isActive 
+    ? "bg-[#1e4841] text-white shadow-md" 
+    : "hover:bg-[#f5f5f5] text-[#6b7270]";
 
   return (
     <div onClick={handleClick} className={`${baseClasses} ${activeClasses}`}>
-      <div className="w-[24px] h-[24px] shrink-0 flex items-center justify-center">
-        <span className="text-[20px]">
+      <div className="w-[20px] h-[20px] shrink-0 flex items-center justify-center">
+        <span className="text-[18px]">
           {getIcon(item.icon)}
         </span>
       </div>
-      <div className="flex pt-[5px] pr-[2px] pb-[5px] pl-0 gap-[10px] items-center grow">
-        <span className={`font-['Urbanist'] text-[14px] font-semibold leading-[14px] ${
-          isActive ? 'text-[#232d2c]' : 'text-[#6b7270]'
+      <div className="flex items-center grow">
+        <span className={`font-['Urbanist'] text-[15px] font-medium ${
+          isActive ? 'text-white' : 'text-[#232d2c]'
         }`}>
           {item.label}
         </span>
       </div>
       {item.badge && (
-        <div className="flex w-[20px] h-[20px] items-center justify-center bg-[#f63440] rounded-[10px]">
-          <span className="font-['Urbanist'] text-[11px] font-normal text-[#fbfbfc]">
+        <div className="flex w-[20px] h-[20px] items-center justify-center bg-[#f63440] rounded-full">
+          <span className="font-['Urbanist'] text-[11px] font-semibold text-white">
             {item.badge > 99 ? '99' : item.badge}
           </span>
         </div>
