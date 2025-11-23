@@ -127,27 +127,6 @@ const CallsManagement: React.FC = () => {
 
           {callStats && (
             <>
-              {/* Today's Activity */}
-              <div className="flex flex-col gap-[12px]">
-                <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">
-                  📊 Today's Activity
-                </h2>
-                <div className="flex flex-wrap gap-[18px]">
-                  <StatCard
-                    label="Calls Today"
-                    value={callStats.callsToday}
-                    icon="📱"
-                    bgColor="bg-gradient-to-br from-blue-50 to-blue-100"
-                  />
-                  <StatCard
-                    label="Duration Today"
-                    value={formatDuration(callStats.callDurationTodayMinutes)}
-                    icon="⏱️"
-                    bgColor="bg-gradient-to-br from-purple-50 to-purple-100"
-                  />
-                </div>
-              </div>
-
               {/* Total Call Statistics */}
               <div className="flex flex-col gap-[12px]">
                 <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">
@@ -220,39 +199,6 @@ const CallsManagement: React.FC = () => {
                     icon="📏"
                     bgColor="bg-gradient-to-br from-teal-50 to-teal-100"
                   />
-                </div>
-              </div>
-
-              {/* Summary Card */}
-              <div className="bg-gradient-to-br from-[#1e4841] to-[#2d5f56] rounded-[16px] p-[24px] text-white">
-                <h3 className="font-['Urbanist'] text-[20px] font-bold mb-[16px]">
-                  📋 Quick Summary
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px]">
-                  <div className="flex flex-col gap-[4px]">
-                    <p className="font-['Urbanist'] text-[12px] opacity-80">Success Rate</p>
-                    <p className="font-['Urbanist'] text-[20px] font-bold">
-                      {callStats.totalCalls > 0 
-                        ? ((callStats.totalCompletedCalls / callStats.totalCalls) * 100).toFixed(1)
-                        : 0}%
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-[4px]">
-                    <p className="font-['Urbanist'] text-[12px] opacity-80">Decline Rate</p>
-                    <p className="font-['Urbanist'] text-[20px] font-bold">
-                      {callStats.totalCalls > 0 
-                        ? ((callStats.totalDeclinedCalls / callStats.totalCalls) * 100).toFixed(1)
-                        : 0}%
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-[4px]">
-                    <p className="font-['Urbanist'] text-[12px] opacity-80">Failure Rate</p>
-                    <p className="font-['Urbanist'] text-[20px] font-bold">
-                      {callStats.totalCalls > 0 
-                        ? ((callStats.totalFailedCalls / callStats.totalCalls) * 100).toFixed(1)
-                        : 0}%
-                    </p>
-                  </div>
                 </div>
               </div>
             </>

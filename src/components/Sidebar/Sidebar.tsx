@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import MenuItem from './MenuItem';
-import PromoCard from './PromoCard';
 import Logo from './Logo';
 
 interface MenuItemType {
@@ -24,13 +23,20 @@ const Sidebar: React.FC = () => {
     },
     {
       id: '2',
+      label: 'Revenue',
+      icon: '💰',
+      path: '/revenue',
+      isActive: window.location.pathname === '/revenue'
+    },
+    {
+      id: '3',
       label: 'Users',
       icon: '👥',
       path: '/users',
       isActive: window.location.pathname.startsWith('/users')
     },
     {
-      id: '3',
+      id: '4',
       label: 'Calls',
       icon: '📞',
       path: '/calls',
@@ -74,10 +80,6 @@ const Sidebar: React.FC = () => {
             <MenuItem key={item.id} item={item} />
           ))}
         </nav>
-
-        <div className="px-[16px] pb-[20px]">
-          <PromoCard />
-        </div>
       </aside>
 
       {/* Mobile Overlay */}

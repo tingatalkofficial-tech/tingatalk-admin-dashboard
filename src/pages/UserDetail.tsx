@@ -324,22 +324,6 @@ const UserDetailPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Highest Day Earnings */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-                <div className="flex flex-col gap-[8px] p-[16px] rounded-[12px] border border-[#e4e6e5] bg-white">
-                  <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">Highest Day Earnings (INR)</span>
-                  <span className="font-['Urbanist'] text-[24px] font-bold text-[#232d2c]">
-                    ₹{user.femaleAdminData.highestDayEarningsINR.toFixed(2)}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-[8px] p-[16px] rounded-[12px] border border-[#e4e6e5] bg-white">
-                  <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">Highest Day Earnings Date</span>
-                  <span className="font-['Urbanist'] text-[16px] font-semibold text-[#232d2c]">
-                    {user.femaleAdminData.highestDayEarningsDate || 'N/A'}
-                  </span>
-                </div>
-              </div>
-
               {/* Rating & Likes */}
               <div className="flex flex-col gap-[12px]">
                 <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">

@@ -45,7 +45,7 @@ export const fetchUserDetail = async (userId: string): Promise<UserDetail> => {
       }
     }
 
-    // If female, fetch admin data
+    // If female, fetch admin data and earnings data
     if (userData.gender === 'female') {
       try {
         const femaleAdminDoc = await getDoc(doc(db, 'female_users_admin', userId));
@@ -58,6 +58,23 @@ export const fetchUserDetail = async (userId: string): Promise<UserDetail> => {
         }
       } catch (err) {
         console.warn('No female admin data for user:', userId);
+      }
+
+      // Fetch call stats from female_earnings collection
+      try {
+        const femaleEarningsDoc = await getDoc(doc(db, 'female_earnings', userId));
+        if (femaleEarningsDoc.exists() && userDetail.femaleAdminData) {
+          const earningsData = femaleEarningsDoc.data();
+          // Override audio and video calls with data from female_earnings
+          userDetail.femaleAdminData.totalAudioCallsReceived = earningsData.totalAudioCalls || 0;
+          userDetail.femaleAdminData.totalVideoCallsReceived = earningsData.totalVideoCalls || 0;
+          console.log('✅ Updated call stats from female_earnings:', {
+            totalAudioCalls: earningsData.totalAudioCalls,
+            totalVideoCalls: earningsData.totalVideoCalls
+          });
+        }
+      } catch (err) {
+        console.warn('No female earnings data for user:', userId);
       }
     }
 

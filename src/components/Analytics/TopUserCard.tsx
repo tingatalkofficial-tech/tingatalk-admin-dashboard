@@ -40,27 +40,13 @@ const TopUserCard: React.FC<TopUserCardProps> = ({ user, type }) => {
         <span className="text-[14px] font-bold">{getRankIcon(user.rank)}</span>
       </div>
       
-      <div className="flex items-center gap-[8px] flex-1 min-w-0">
-        {user.avatar ? (
-          <img 
-            src={user.avatar} 
-            alt={user.name}
-            className="w-[36px] h-[36px] rounded-full object-cover flex-shrink-0"
-          />
-        ) : (
-          <div className="flex w-[36px] h-[36px] items-center justify-center bg-[#ecf4e9] rounded-full flex-shrink-0">
-            <span className="text-[16px]">👤</span>
-          </div>
-        )}
-        
-        <div className="flex flex-col flex-1 min-w-0">
-          <span className="font-['Urbanist'] text-[14px] font-semibold text-[#232d2c] truncate">
-            {user.name}
-          </span>
-          <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">
-            {getDisplayValue()}
-          </span>
-        </div>
+      <div className="flex flex-col flex-1 min-w-0">
+        <span className="font-['Urbanist'] text-[14px] font-semibold text-[#232d2c] truncate">
+          {user.name}
+        </span>
+        <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">
+          {getDisplayValue()}
+        </span>
       </div>
     </div>
   );
