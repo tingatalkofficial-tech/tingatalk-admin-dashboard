@@ -1,9 +1,16 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { MenuItem as MenuItemType } from '../../types';
 
 interface MenuItemProps {
-  item: MenuItemType;
+  item: {
+    id: string;
+    label: string;
+    icon: string;
+    path?: string;
+    active?: boolean;
+    isActive?: boolean;
+    badge?: number;
+  };
 }
 
 const MenuItem: React.FC<MenuItemProps> = ({ item }) => {
@@ -61,7 +68,8 @@ const getIcon = (iconName: string): string => {
     promos: '🎁',
     insights: '💡',
   };
-  return icons[iconName] || '•';
+  // If the icon is already an emoji (not a named key), return it directly
+  return icons[iconName] || iconName;
 };
 
 export default MenuItem;

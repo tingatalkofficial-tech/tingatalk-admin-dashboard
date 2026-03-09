@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MenuItem from './MenuItem';
 import Logo from './Logo';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db } from '../../utils/firebase';
 
 interface MenuItemType {
   id: string;
@@ -8,11 +10,27 @@ interface MenuItemType {
   icon: string;
   path: string;
   isActive: boolean;
+  badge?: number;
 }
 
 const Sidebar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+  const [unverifiedCount, setUnverifiedCount] = useState(0);
+
+  useEffect(() => {
+    const q = query(
+      collection(db, 'users'),
+      where('gender', '==', 'female'),
+      where('isVerified', '==', false)
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setUnverifiedCount(snapshot.size);
+    }, (err) => {
+      console.error('Error listening to unverified count:', err);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const menuItems: MenuItemType[] = [
     {
       id: '1',
@@ -30,13 +48,21 @@ const Sidebar: React.FC = () => {
     },
     {
       id: '3',
+      label: 'Verification',
+      icon: '🛡️',
+      path: '/verification',
+      isActive: window.location.pathname === '/verification',
+      badge: unverifiedCount > 0 ? unverifiedCount : undefined
+    },
+    {
+      id: '4',
       label: 'Users',
       icon: '👥',
       path: '/users',
       isActive: window.location.pathname.startsWith('/users')
     },
     {
-      id: '4',
+      id: '5',
       label: 'Calls',
       icon: '📞',
       path: '/calls',

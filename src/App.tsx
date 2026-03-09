@@ -6,6 +6,7 @@ import UsersManagement from './pages/UsersManagement';
 import UserDetailPage from './pages/UserDetail';
 import CallsManagement from './pages/CallsManagement';
 import RevenuePage from './pages/RevenuePage';
+import VerificationPage from './pages/VerificationPage';
 import './page/index.css';
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/revenue" element={<RevenuePage />} />
           <Route path="/users" element={<UsersManagement />} />
           <Route path="/users/:userId" element={<UserDetailPage />} />
+          <Route path="/verification" element={<VerificationPage />} />
           <Route path="/calls" element={<CallsManagement />} />
         </Routes>
       </AnalyticsProvider>
