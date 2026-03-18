@@ -25,57 +25,94 @@ export const fetchUserDetail = async (userId: string): Promise<UserDetail> => {
     if (!userDoc.exists()) {
       throw new Error('User not found');
     }
-    
-    const userData = { id: userDoc.id, ...userDoc.data() } as User;
+
+    const rawData = userDoc.data();
+    const userData = { id: userDoc.id, ...rawData } as User;
     const userDetail: UserDetail = { ...userData };
 
-    // If male, fetch admin data
+    // Male user: build admin data directly from users document
+    // All stats are written here by MaleUserTrackingService + backend payments
     if (userData.gender === 'male') {
-      try {
-        const maleAdminDoc = await getDoc(doc(db, 'male_users_admin', userId));
-        if (maleAdminDoc.exists()) {
-          userDetail.maleAdminData = {
-            userId,
-            ...maleAdminDoc.data()
-          } as any;
-          console.log('✅ Fetched male admin data:', userDetail.maleAdminData);
-        }
-      } catch (err) {
-        console.warn('No male admin data for user:', userId);
-      }
+      userDetail.maleAdminData = {
+        userId,
+        name: rawData.name || rawData.displayName || '',
+        phoneNumber: rawData.phoneNumber || '',
+        age: rawData.age || 0,
+        joinedAt: rawData.createdAt || null,
+        lastActiveAt: rawData.lastActiveAt || null,
+        // Call stats (written by MaleUserTrackingService to users doc)
+        totalCallsMade: rawData.totalCallsMade || 0,
+        totalCallDurationMinutes: rawData.totalCallDurationMinutes || 0,
+        totalVideoCallsMade: rawData.totalVideoCallsMade || 0,
+        totalAudioCallsMade: rawData.totalAudioCallsMade || 0,
+        // Financial (written by backend + MaleUserTrackingService to users doc)
+        totalCoinsPurchased: rawData.totalCoinsPurchased || 0,
+        totalPurchaseCount: rawData.totalPurchaseCount || 0,
+        totalCoinsSpent: rawData.totalCoinsSpent || 0,
+        currentBalance: rawData.coins ?? rawData.coinBalance ?? 0,
+        totalSpentINR: rawData.totalSpentINR || 0,
+        // Favorites
+        favoritesCount: rawData.favoritesCount || 0,
+        // Daily Rewards (written by daily_rewards_service to users doc)
+        currentStreak: rawData.currentStreak || 0,
+        highestStreak: rawData.highestStreak || 0,
+        totalDailyRewardsCollected: rawData.totalDailyRewardsCollected || 0,
+      } as any;
+      console.log('✅ Built male admin data from users doc');
     }
 
-    // If female, fetch admin data and earnings data
+    // Female user: build admin data from users doc + female_earnings (source of truth)
     if (userData.gender === 'female') {
+      // Fetch earnings data from female_earnings collection (source of truth for financial + call stats)
+      let earningsData: Record<string, any> = {};
+      let todayEarnings = 0;
       try {
-        const femaleAdminDoc = await getDoc(doc(db, 'female_users_admin', userId));
-        if (femaleAdminDoc.exists()) {
-          userDetail.femaleAdminData = {
-            userId,
-            ...femaleAdminDoc.data()
-          } as any;
-          console.log('✅ Fetched female admin data:', userDetail.femaleAdminData);
+        const now = new Date();
+        const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+        const [femaleEarningsDoc, todayDoc] = await Promise.all([
+          getDoc(doc(db, 'female_earnings', userId)),
+          getDoc(doc(db, 'female_earnings', userId, 'daily', dateKey))
+        ]);
+
+        if (femaleEarningsDoc.exists()) {
+          earningsData = femaleEarningsDoc.data();
+          console.log('✅ Fetched female_earnings data');
+        }
+        if (todayDoc.exists()) {
+          todayEarnings = todayDoc.data().earnings || 0;
         }
       } catch (err) {
-        console.warn('No female admin data for user:', userId);
+        console.warn('Could not fetch female earnings for user:', userId);
       }
 
-      // Fetch call stats from female_earnings collection
-      try {
-        const femaleEarningsDoc = await getDoc(doc(db, 'female_earnings', userId));
-        if (femaleEarningsDoc.exists() && userDetail.femaleAdminData) {
-          const earningsData = femaleEarningsDoc.data();
-          // Override audio and video calls with data from female_earnings
-          userDetail.femaleAdminData.totalAudioCallsReceived = earningsData.totalAudioCalls || 0;
-          userDetail.femaleAdminData.totalVideoCallsReceived = earningsData.totalVideoCalls || 0;
-          console.log('✅ Updated call stats from female_earnings:', {
-            totalAudioCalls: earningsData.totalAudioCalls,
-            totalVideoCalls: earningsData.totalVideoCalls
-          });
-        }
-      } catch (err) {
-        console.warn('No female earnings data for user:', userId);
-      }
+      userDetail.femaleAdminData = {
+        userId,
+        name: rawData.name || rawData.displayName || '',
+        phoneNumber: rawData.phoneNumber || '',
+        age: rawData.age || 0,
+        joinedAt: rawData.createdAt || null,
+        lastActiveAt: rawData.lastActiveAt || null,
+        // Rating & feedback (from users doc, written by statsSyncUtil / powerup_service)
+        rating: rawData.rating || 0,
+        totalLikes: rawData.totalLikes || 0,
+        totalDislikes: rawData.totalDislikes || 0,
+        // Calls (from female_earnings — source of truth)
+        totalCallsReceived: earningsData.totalCalls || 0,
+        totalCallDurationMinutes: Math.round(((earningsData.totalDurationSeconds || 0) / 60) * 10) / 10,
+        totalVideoCallsReceived: earningsData.totalVideoCalls || 0,
+        totalAudioCallsReceived: earningsData.totalAudioCalls || 0,
+        // Earnings (from female_earnings — source of truth)
+        totalEarningsINR: earningsData.totalEarnings || 0,
+        availableBalanceINR: earningsData.availableBalance || 0,
+        claimedAmountINR: earningsData.claimedAmount || 0,
+        highestDayEarningsINR: earningsData.highestDayEarnings || 0,
+        highestDayEarningsDate: earningsData.highestDayEarningsDate || '',
+        todayEarningsINR: todayEarnings,
+        // Popularity (from users doc)
+        favoritedByCount: rawData.favoritedByCount || 0,
+      } as any;
+      console.log('✅ Built female admin data from users + female_earnings');
     }
 
     return userDetail;

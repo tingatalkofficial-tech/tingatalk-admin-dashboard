@@ -1,4 +1,4 @@
-import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 import { AnalyticsData, TopFemaleUser } from '../types/analytics';
 
@@ -9,23 +9,14 @@ interface AdminAnalyticsUserStats {
   totalVerifiedFemales: number;
   totalOnlineUsers: number;
   activeUsersToday: number;
-  activeUsersThisWeek: number;
-  activeUsersThisMonth: number;
   newUsersToday: number;
-  newUsersThisWeek: number;
-  newUsersThisMonth: number;
 }
 
 interface AdminAnalyticsFinancialStats {
   totalRevenue: number;
   todayRevenue: number;
-  thisWeekRevenue: number;
-  thisMonthRevenue: number;
   totalPayouts: number;
   pendingPayouts: number;
-  todayPayouts: number;
-  thisWeekPayouts: number;
-  thisMonthPayouts: number;
   netProfit: number;
   trueProfit?: number;
   pendingWithdrawalRequests: number;
@@ -43,10 +34,6 @@ interface AdminAnalyticsCallStats {
   averageCallDurationMinutes: number;
   callsToday: number;
   callDurationTodayMinutes: number;
-  callsThisWeek: number;
-  callDurationThisWeekMinutes: number;
-  callsThisMonth: number;
-  callDurationThisMonthMinutes: number;
 }
 
 interface RankingFemale {
@@ -56,7 +43,6 @@ interface RankingFemale {
   rating?: number;
   totalLikes?: number;
   totalCalls?: number;
-  totalEarningsINR?: number;
   favoritedByCount?: number;
 }
 
@@ -68,17 +54,31 @@ interface RankingsData {
 export const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
   try {
     console.log('🔍 Fetching analytics data from admin_analytics collection...');
-    
-    // Fetch admin analytics documents
-    const [userStatsDoc, financialStatsDoc, callStatsDoc, rankingsDoc] = await Promise.all([
+
+    // Fetch admin analytics documents + top earners/callers from users collection
+    const [userStatsDoc, financialStatsDoc, callStatsDoc, rankingsDoc, topEarnersSnapshot, topCallersSnapshot] = await Promise.all([
       getDoc(doc(db, 'admin_analytics', 'user_stats')),
       getDoc(doc(db, 'admin_analytics', 'financial_stats')),
       getDoc(doc(db, 'admin_analytics', 'call_stats')),
-      getDoc(doc(db, 'rankings', 'by_rating'))
+      getDoc(doc(db, 'rankings', 'by_rating')),
+      // Top earners: query users collection directly (female_earnings data is synced to users doc)
+      getDocs(query(
+        collection(db, 'users'),
+        where('gender', '==', 'female'),
+        orderBy('totalEarnings', 'desc'),
+        limit(3)
+      )),
+      // Top callers: query users collection directly
+      getDocs(query(
+        collection(db, 'users'),
+        where('gender', '==', 'female'),
+        orderBy('totalCalls', 'desc'),
+        limit(3)
+      ))
     ]);
 
     // Extract data with defaults
-    const userStats = userStatsDoc.exists() 
+    const userStats = userStatsDoc.exists()
       ? userStatsDoc.data() as AdminAnalyticsUserStats
       : {
           totalUsers: 0,
@@ -87,29 +87,30 @@ export const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
           totalVerifiedFemales: 0,
           totalOnlineUsers: 0,
           activeUsersToday: 0,
-          activeUsersThisWeek: 0,
-          activeUsersThisMonth: 0,
-          newUsersToday: 0,
-          newUsersThisWeek: 0,
-          newUsersThisMonth: 0
+          newUsersToday: 0
         };
 
-    const financialStats = financialStatsDoc.exists()
+    const rawFinancial = financialStatsDoc.exists()
       ? financialStatsDoc.data() as AdminAnalyticsFinancialStats
       : {
           totalRevenue: 0,
           todayRevenue: 0,
-          thisWeekRevenue: 0,
-          thisMonthRevenue: 0,
           totalPayouts: 0,
           pendingPayouts: 0,
-          todayPayouts: 0,
-          thisWeekPayouts: 0,
-          thisMonthPayouts: 0,
           netProfit: 0,
           pendingWithdrawalRequests: 0,
           pendingWithdrawalAmount: 0
         };
+
+    // Always recalculate profits on-read to avoid stale values from dual-write race conditions
+    const totalRevenue = rawFinancial.totalRevenue || 0;
+    const totalPayouts = rawFinancial.totalPayouts || 0;
+    const pendingPayouts = rawFinancial.pendingPayouts || 0;
+    const financialStats = {
+      ...rawFinancial,
+      netProfit: totalRevenue - totalPayouts,
+      trueProfit: totalRevenue - totalPayouts - pendingPayouts,
+    };
 
     const callStats = callStatsDoc.exists()
       ? callStatsDoc.data() as AdminAnalyticsCallStats
@@ -123,11 +124,7 @@ export const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
           totalCallDurationMinutes: 0,
           averageCallDurationMinutes: 0,
           callsToday: 0,
-          callDurationTodayMinutes: 0,
-          callsThisWeek: 0,
-          callDurationThisWeekMinutes: 0,
-          callsThisMonth: 0,
-          callDurationThisMonthMinutes: 0
+          callDurationTodayMinutes: 0
         };
 
     const rankingsData = rankingsDoc.exists()
@@ -140,20 +137,14 @@ export const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
       calls: callStats.totalCalls
     });
 
-    // Get top earners from female_users_admin collection
-    const topEarnersQuery = query(
-      collection(db, 'female_users_admin'),
-      orderBy('totalEarningsINR', 'desc'),
-      limit(3)
-    );
-    const topEarnersSnapshot = await getDocs(topEarnersQuery);
+    // Build top earners from users collection (source of truth)
     const topEarners: TopFemaleUser[] = topEarnersSnapshot.docs.map((doc, index) => {
       const data = doc.data();
       return {
         id: doc.id,
-        name: data.name || 'Unknown',
-        avatar: data.avatarUrl || undefined,
-        earnings: data.totalEarningsINR || 0,
+        name: data.name || data.displayName || 'Unknown',
+        avatar: data.avatarUrl || data.profilePhotoUrl || undefined,
+        earnings: data.totalEarnings || 0,
         rank: index + 1
       };
     });
@@ -169,47 +160,41 @@ export const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
         rank: index + 1
       }));
 
-    // Get top callers (most calls) from female_users_admin
-    const topCallersQuery = query(
-      collection(db, 'female_users_admin'),
-      orderBy('totalCallsReceived', 'desc'),
-      limit(3)
-    );
-    const topCallersSnapshot = await getDocs(topCallersQuery);
+    // Build top callers from users collection (source of truth)
     const topCallers: TopFemaleUser[] = topCallersSnapshot.docs.map((doc, index) => {
       const data = doc.data();
       return {
         id: doc.id,
-        name: data.name || 'Unknown',
-        avatar: data.avatarUrl || undefined,
-        totalCalls: data.totalCallsReceived || 0,
+        name: data.name || data.displayName || 'Unknown',
+        avatar: data.avatarUrl || data.profilePhotoUrl || undefined,
+        totalCalls: data.totalCalls || 0,
         rank: index + 1
       };
     });
 
     const result: AnalyticsData = {
-      // Financial data - mapped to correct Firestore fields
+      // Financial data - recalculated on read for accuracy
       totalEarnings: Math.round(financialStats.totalRevenue * 100) / 100,        // Coin Revenue
       audioCallEarnings: Math.round(financialStats.netProfit * 100) / 100,       // Net Profit
       videoCallEarnings: Math.round(financialStats.pendingPayouts * 100) / 100,  // Pending Payouts
-      coinPurchaseEarnings: Math.round((financialStats.trueProfit || financialStats.netProfit) * 100) / 100, // Actual Profit
-      
+      coinPurchaseEarnings: Math.round(financialStats.trueProfit * 100) / 100,   // Actual Profit
+
       // Call statistics
       totalCalls: callStats.totalCompletedCalls,
       totalAudioCalls: callStats.totalAudioCallsCompleted,
       totalVideoCalls: callStats.totalVideoCallsCompleted,
-      
+
       // User statistics
       totalUsers: userStats.totalUsers,
       totalMaleUsers: userStats.totalMaleUsers,
       totalFemaleUsers: userStats.totalFemaleUsers,
-      
+
       // Top performers
       topEarners,
       topRated,
       topCallers
     };
-    
+
     console.log('✅ Analytics data prepared:', result);
     return result;
   } catch (error) {
