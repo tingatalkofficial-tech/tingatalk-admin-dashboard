@@ -6,6 +6,7 @@ import UsersManagement from './pages/UsersManagement';
 import UserDetailPage from './pages/UserDetail';
 import CallsManagement from './pages/CallsManagement';
 import RevenuePage from './pages/RevenuePage';
+import PayoutsPage from './pages/PayoutsPage';
 import VerificationPage from './pages/VerificationPage';
 import './page/index.css';
 
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/" element={<Navigate to="/analytics" replace />} />
           <Route path="/analytics" element={<AnalyticsDashboard />} />
           <Route path="/revenue" element={<RevenuePage />} />
+          <Route path="/payouts" element={<PayoutsPage />} />
           <Route path="/users" element={<UsersManagement />} />
           <Route path="/users/:userId" element={<UserDetailPage />} />
           <Route path="/verification" element={<VerificationPage />} />

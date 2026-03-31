@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import MenuItem from './MenuItem';
 import Logo from './Logo';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { onPendingPayoutsCount } from '../../services/payoutService';
 import { db } from '../../utils/firebase';
 
 interface MenuItemType {
@@ -16,6 +17,7 @@ interface MenuItemType {
 const Sidebar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [unverifiedCount, setUnverifiedCount] = useState(0);
+  const [pendingPayoutsCount, setPendingPayoutsCount] = useState(0);
 
   useEffect(() => {
     const q = query(
@@ -28,6 +30,11 @@ const Sidebar: React.FC = () => {
     }, (err) => {
       console.error('Error listening to unverified count:', err);
     });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = onPendingPayoutsCount(setPendingPayoutsCount);
     return () => unsubscribe();
   }, []);
 
@@ -48,6 +55,14 @@ const Sidebar: React.FC = () => {
     },
     {
       id: '3',
+      label: 'Payouts',
+      icon: '💸',
+      path: '/payouts',
+      isActive: window.location.pathname === '/payouts',
+      badge: pendingPayoutsCount > 0 ? pendingPayoutsCount : undefined
+    },
+    {
+      id: '4',
       label: 'Verification',
       icon: '🛡️',
       path: '/verification',
@@ -55,14 +70,14 @@ const Sidebar: React.FC = () => {
       badge: unverifiedCount > 0 ? unverifiedCount : undefined
     },
     {
-      id: '4',
+      id: '5',
       label: 'Users',
       icon: '👥',
       path: '/users',
       isActive: window.location.pathname.startsWith('/users')
     },
     {
-      id: '5',
+      id: '6',
       label: 'Calls',
       icon: '📞',
       path: '/calls',
