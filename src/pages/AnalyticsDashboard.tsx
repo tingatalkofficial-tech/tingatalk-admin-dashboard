@@ -4,7 +4,6 @@ import Header from '../components/Header/Header';
 import EarningsCard from '../components/Analytics/EarningsCard';
 import CallStatsCard from '../components/Analytics/CallStatsCard';
 import UserStatsCard from '../components/Analytics/UserStatsCard';
-import TopUsersSection from '../components/Analytics/TopUsersSection';
 import { useAnalytics } from '../context/AnalyticsContext';
 import { EarningsStat, CallStat, UserStat } from '../types/analytics';
 
@@ -183,32 +182,6 @@ const AnalyticsDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Top Performers Section */}
-          <div className="flex flex-col gap-[12px]">
-            <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">
-              🏆 Top Performers
-            </h2>
-            <div className="flex flex-wrap gap-[20px]">
-              <TopUsersSection
-                title="Top Earners"
-                users={analyticsData.topEarners}
-                type="earnings"
-                icon="💎"
-              />
-              <TopUsersSection
-                title="Top Rated"
-                users={analyticsData.topRated}
-                type="rating"
-                icon="⭐"
-              />
-              <TopUsersSection
-                title="Most Calls"
-                users={analyticsData.topCallers}
-                type="calls"
-                icon="📱"
-              />
-            </div>
-          </div>
         </div>
       </main>
     </div>

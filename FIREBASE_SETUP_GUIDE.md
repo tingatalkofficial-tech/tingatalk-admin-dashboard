@@ -1,4 +1,4 @@
-# Firebase Setup Guide
+  # Firebase Setup Guide
 
 ## Prerequisites
 

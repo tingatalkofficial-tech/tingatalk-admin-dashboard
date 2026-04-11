@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(firebase:*)",
+      "Bash(xargs cat:*)",
+      "Bash(xargs grep:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite:*)",
+      "mcp__plugin_firebase_firebase__firestore_list_databases",
+      "mcp__plugin_firebase_firebase__firestore_list_collections",
+      "mcp__plugin_firebase_firebase__firebase_get_environment",
+      "Bash(gcloud beta:*)",
+      "Bash(where gcloud:*)",
+      "Read(//c/Program Files \\(x86\\)/Google/**)",
+      "Read(//c/Users/**)",
+      "Bash(npx firebase:*)",
+      "mcp__plugin_firebase_firebase__firestore_query_collection",
+      "Bash(cd:*)",
+      "mcp__plugin_firebase_firebase__firestore_list_documents",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(npm run:*)",
+      "Bash(gh auth:*)"
+    ]
+  }
+}
