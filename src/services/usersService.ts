@@ -2,6 +2,9 @@ import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 import { User, UserDetail } from '../types/users';
 
+const isHttpUrl = (val: any): val is string =>
+  typeof val === 'string' && (val.startsWith('http://') || val.startsWith('https://'));
+
 export const fetchAllUsers = async (): Promise<User[]> => {
   try {
     const snapshot = await getDocs(collection(db, 'users'));
@@ -14,12 +17,15 @@ export const fetchAllUsers = async (): Promise<User[]> => {
         age: data.age,
         createdAt: data.createdAt,
         phoneNumber: data.phoneNumber,
-        profileImage: data.profilePhotoUrl || data.avatarUrl || undefined,
+        profileImage: isHttpUrl(data.profilePhotoUrl) ? data.profilePhotoUrl
+          : isHttpUrl(data.avatarUrl) ? data.avatarUrl
+          : undefined,
         isOnline: data.isOnline || false,
         isVerified: data.isVerified || false,
         totalEarnings: data.totalEarnings || 0,
         totalCalls: data.totalCalls || data.totalCallsMade || 0,
         coins: data.coins || 0,
+        verificationPhoto: isHttpUrl(data.verificationPhoto) ? data.verificationPhoto : undefined,
       } as User;
     });
 
@@ -40,7 +46,18 @@ export const fetchUserDetail = async (userId: string): Promise<UserDetail> => {
     }
 
     const rawData = userDoc.data();
-    const userData = { id: userDoc.id, ...rawData } as User;
+    const userData = {
+      id: userDoc.id,
+      displayName: rawData.displayName || rawData.name || 'Unknown',
+      gender: rawData.gender,
+      age: rawData.age,
+      createdAt: rawData.createdAt,
+      phoneNumber: rawData.phoneNumber,
+      profileImage: isHttpUrl(rawData.profilePhotoUrl) ? rawData.profilePhotoUrl
+        : isHttpUrl(rawData.avatarUrl) ? rawData.avatarUrl
+        : undefined,
+      verificationPhoto: isHttpUrl(rawData.verificationPhoto) ? rawData.verificationPhoto : undefined,
+    } as User;
     const userDetail: UserDetail = { ...userData };
 
     // Male user: build admin data directly from users document

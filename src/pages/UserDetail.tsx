@@ -85,7 +85,7 @@ const UserDetailPage: React.FC = () => {
 
           {/* Back Button */}
           <button
-            onClick={() => navigate('/users')}
+            onClick={() => navigate(-1)}
             className="flex items-center gap-[8px] w-fit px-[12px] py-[8px] text-[#1e4841] hover:bg-[#ecf4e9] rounded-[8px] transition-colors font-['Urbanist'] text-[14px] font-medium"
           >
             <span>←</span>
@@ -94,22 +94,25 @@ const UserDetailPage: React.FC = () => {
 
           {/* User Profile Card */}
           <div className="flex flex-col md:flex-row gap-[20px] p-[24px] rounded-[16px] border border-[#e4e6e5] bg-white">
-            {user.profileImage ? (
-              <img
-                src={user.profileImage}
-                alt={user.displayName}
-                className="w-[120px] h-[120px] rounded-full object-cover"
-              />
-            ) : (
-              <div className={`flex w-[120px] h-[120px] items-center justify-center rounded-full ${genderColor}`}>
-                <span className="text-[60px]">{genderIcon}</span>
-              </div>
-            )}
+            <div className={`flex w-[120px] h-[120px] items-center justify-center rounded-full ${genderColor} flex-shrink-0`}>
+              <span className="text-[60px]">{genderIcon}</span>
+            </div>
 
             <div className="flex-1 flex flex-col gap-[12px]">
               <h1 className="font-['Urbanist'] text-[28px] font-bold text-[#232d2c]">
                 {user.displayName}
               </h1>
+              {/* Verification Photo Link */}
+              {user.verificationPhoto && (
+                <a
+                  href={user.verificationPhoto}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-[6px] w-fit px-[12px] py-[6px] bg-blue-50 text-blue-600 rounded-[6px] hover:bg-blue-100 transition-colors font-['Urbanist'] text-[13px] font-medium"
+                >
+                  📷 View Verification Photo
+                </a>
+              )}
               <div className="flex flex-wrap gap-[12px]">
                 <div className="flex items-center gap-[6px] px-[12px] py-[6px] bg-[#ecf4e9] rounded-[6px]">
                   <span className="font-['Urbanist'] text-[14px] text-[#6b7270]">Gender:</span>

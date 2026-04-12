@@ -55,8 +55,8 @@ export const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
   try {
     console.log('🔍 Fetching analytics data from admin_analytics collection...');
 
-    // Fetch admin analytics documents + top earners/callers from users collection
-    const [userStatsDoc, financialStatsDoc, callStatsDoc, rankingsDoc, topEarnersSnapshot, topCallersSnapshot] = await Promise.all([
+    // Fetch admin analytics documents + top earners/callers + live user counts
+    const [userStatsDoc, financialStatsDoc, callStatsDoc, rankingsDoc, topEarnersSnapshot, topCallersSnapshot, allUsersSnapshot] = await Promise.all([
       getDoc(doc(db, 'admin_analytics', 'user_stats')),
       getDoc(doc(db, 'admin_analytics', 'financial_stats')),
       getDoc(doc(db, 'admin_analytics', 'call_stats')),
@@ -74,7 +74,9 @@ export const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
         where('gender', '==', 'female'),
         orderBy('totalCalls', 'desc'),
         limit(3)
-      ))
+      )),
+      // Fetch all users for accurate live counts
+      getDocs(collection(db, 'users'))
     ]);
 
     // Extract data with defaults
@@ -131,8 +133,19 @@ export const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
       ? rankingsDoc.data() as RankingsData
       : { topFemales: [] };
 
-    console.log('✅ Admin analytics fetched:', {
-      users: userStats.totalUsers,
+    // Compute live user counts from actual users collection
+    let liveTotal = 0;
+    let liveMale = 0;
+    let liveFemale = 0;
+    allUsersSnapshot.docs.forEach(d => {
+      liveTotal++;
+      const g = d.data().gender;
+      if (g === 'male') liveMale++;
+      else if (g === 'female') liveFemale++;
+    });
+
+    console.log('Admin analytics fetched:', {
+      users: liveTotal,
       revenue: financialStats.totalRevenue,
       calls: callStats.totalCalls
     });
@@ -185,10 +198,10 @@ export const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
       totalAudioCalls: callStats.totalAudioCallsCompleted,
       totalVideoCalls: callStats.totalVideoCallsCompleted,
 
-      // User statistics
-      totalUsers: userStats.totalUsers,
-      totalMaleUsers: userStats.totalMaleUsers,
-      totalFemaleUsers: userStats.totalFemaleUsers,
+      // User statistics (live counts from users collection)
+      totalUsers: liveTotal,
+      totalMaleUsers: liveMale,
+      totalFemaleUsers: liveFemale,
 
       // Top performers
       topEarners,

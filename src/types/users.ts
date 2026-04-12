@@ -14,6 +14,7 @@ export interface User {
   totalEarnings?: number;
   totalCalls?: number;
   coins?: number;
+  verificationPhoto?: string;
 }
 
 export interface FemaleEarnings {

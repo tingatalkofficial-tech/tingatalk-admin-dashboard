@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar/Sidebar';
 import Header from '../components/Header/Header';
 import UserCard from '../components/Users/UserCard';
@@ -8,12 +8,14 @@ import { User } from '../types/users';
 
 const UsersManagement: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [selectedGender, setSelectedGender] = useState<'all' | 'male' | 'female'>('all');
+  const initialGender = (searchParams.get('gender') || 'all') as 'all' | 'male' | 'female';
+  const [selectedGender, setSelectedGender] = useState<'all' | 'male' | 'female'>(initialGender);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
 
   useEffect(() => {
     loadUsers();
@@ -53,6 +55,22 @@ const UsersManagement: React.FC = () => {
     }
 
     setFilteredUsers(filtered);
+  };
+
+  const handleGenderChange = (gender: 'all' | 'male' | 'female') => {
+    setSelectedGender(gender);
+    const params: Record<string, string> = {};
+    if (gender !== 'all') params.gender = gender;
+    if (searchQuery) params.q = searchQuery;
+    setSearchParams(params, { replace: true });
+  };
+
+  const handleSearchChange = (q: string) => {
+    setSearchQuery(q);
+    const params: Record<string, string> = {};
+    if (selectedGender !== 'all') params.gender = selectedGender;
+    if (q) params.q = q;
+    setSearchParams(params, { replace: true });
   };
 
   const handleUserClick = (userId: string) => {
@@ -131,7 +149,7 @@ const UsersManagement: React.FC = () => {
               type="text"
               placeholder="Search by name or ID..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="flex-1 px-[16px] py-[12px] rounded-[8px] border border-[#e4e6e5] font-['Urbanist'] text-[14px] focus:outline-none focus:border-[#1e4841]"
             />
           </div>
@@ -139,7 +157,7 @@ const UsersManagement: React.FC = () => {
           {/* Gender Filter Toggle */}
           <div className="flex gap-[8px] p-[4px] bg-[#ecf4e9] rounded-[8px] w-fit">
             <button
-              onClick={() => setSelectedGender('all')}
+              onClick={() => handleGenderChange('all')}
               className={`px-[20px] py-[8px] rounded-[6px] font-['Urbanist'] text-[14px] font-medium transition-colors ${
                 selectedGender === 'all'
                   ? 'bg-[#1e4841] text-white'
@@ -149,7 +167,7 @@ const UsersManagement: React.FC = () => {
               All ({users.length})
             </button>
             <button
-              onClick={() => setSelectedGender('male')}
+              onClick={() => handleGenderChange('male')}
               className={`px-[20px] py-[8px] rounded-[6px] font-['Urbanist'] text-[14px] font-medium transition-colors ${
                 selectedGender === 'male'
                   ? 'bg-[#1e4841] text-white'
@@ -159,7 +177,7 @@ const UsersManagement: React.FC = () => {
               👨 Male ({maleCount})
             </button>
             <button
-              onClick={() => setSelectedGender('female')}
+              onClick={() => handleGenderChange('female')}
               className={`px-[20px] py-[8px] rounded-[6px] font-['Urbanist'] text-[14px] font-medium transition-colors ${
                 selectedGender === 'female'
                   ? 'bg-[#1e4841] text-white'
