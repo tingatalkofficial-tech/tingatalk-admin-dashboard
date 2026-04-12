@@ -3,7 +3,6 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
-  createUserWithEmailAndPassword,
   User,
 } from 'firebase/auth';
 import { auth } from '../utils/firebase';
@@ -36,25 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (error: any) {
-      // If user doesn't exist yet, create the account (first-time setup)
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-        try {
-          await createUserWithEmailAndPassword(auth, email, password);
-        } catch (createError: any) {
-          // If creation also fails, the original sign-in error is more relevant
-          // unless it's a different error (like email already in use)
-          if (createError.code === 'auth/email-already-in-use') {
-            throw new Error('Invalid email or password');
-          }
-          throw createError;
-        }
-        return;
-      }
-      throw error;
-    }
+    await signInWithEmailAndPassword(auth, email, password);
   };
 
   const logout = async () => {

@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import logoImg from '../Assets/logo.png';
 
 const LoginPage: React.FC = () => {
-  const { login } = useAuth();
+  const { login, user, loading } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // If already logged in, redirect to dashboard
+  if (!loading && user) {
+    return <Navigate to="/analytics" replace />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,6 +24,7 @@ const LoginPage: React.FC = () => {
 
     try {
       await login(email, password);
+      navigate('/analytics', { replace: true });
     } catch (err: any) {
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
         setError('Invalid email or password');
