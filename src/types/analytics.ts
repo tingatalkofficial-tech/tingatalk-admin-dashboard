@@ -36,10 +36,11 @@ export interface TopFemaleUser {
 }
 
 export interface AnalyticsData {
-  totalEarnings: number;
-  audioCallEarnings: number;
-  videoCallEarnings: number;
-  coinPurchaseEarnings: number;
+  totalRevenue: number;
+  netProfit: number;
+  pendingPayouts: number;
+  actualProfit: number;
+  todayRevenue: number;
   totalCalls: number;
   totalAudioCalls: number;
   totalVideoCalls: number;

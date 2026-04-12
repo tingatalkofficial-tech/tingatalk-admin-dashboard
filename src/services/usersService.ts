@@ -5,15 +5,28 @@ import { User, UserDetail } from '../types/users';
 export const fetchAllUsers = async (): Promise<User[]> => {
   try {
     const snapshot = await getDocs(collection(db, 'users'));
-    const users: User[] = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as User));
-    
-    console.log(`✅ Fetched ${users.length} users`);
+    const users: User[] = snapshot.docs.map(d => {
+      const data = d.data();
+      return {
+        id: d.id,
+        displayName: data.displayName || data.name || 'Unknown',
+        gender: data.gender,
+        age: data.age,
+        createdAt: data.createdAt,
+        phoneNumber: data.phoneNumber,
+        profileImage: data.profilePhotoUrl || data.avatarUrl || undefined,
+        isOnline: data.isOnline || false,
+        isVerified: data.isVerified || false,
+        totalEarnings: data.totalEarnings || 0,
+        totalCalls: data.totalCalls || data.totalCallsMade || 0,
+        coins: data.coins || 0,
+      } as User;
+    });
+
+    console.log(`Fetched ${users.length} users`);
     return users;
   } catch (error) {
-    console.error('❌ Error fetching users:', error);
+    console.error('Error fetching users:', error);
     throw error;
   }
 };
@@ -94,9 +107,9 @@ export const fetchUserDetail = async (userId: string): Promise<UserDetail> => {
         joinedAt: rawData.createdAt || null,
         lastActiveAt: rawData.lastActiveAt || null,
         // Rating & feedback (from users doc, written by statsSyncUtil / powerup_service)
-        rating: rawData.rating || 0,
-        totalLikes: rawData.totalLikes || 0,
-        totalDislikes: rawData.totalDislikes || 0,
+        rating: earningsData.rating ?? rawData.rating ?? 0,
+        totalLikes: earningsData.totalLikes ?? rawData.totalLikes ?? 0,
+        totalDislikes: earningsData.totalDislikes ?? rawData.totalDislikes ?? 0,
         // Calls (from female_earnings — source of truth)
         totalCallsReceived: earningsData.totalCalls || 0,
         totalCallDurationMinutes: Math.round(((earningsData.totalDurationSeconds || 0) / 60) * 10) / 10,
@@ -105,9 +118,8 @@ export const fetchUserDetail = async (userId: string): Promise<UserDetail> => {
         // Earnings (from female_earnings — source of truth)
         totalEarningsINR: earningsData.totalEarnings || 0,
         availableBalanceINR: earningsData.availableBalance || 0,
+        pendingAmountINR: earningsData.pendingAmount || 0,
         claimedAmountINR: earningsData.claimedAmount || 0,
-        highestDayEarningsINR: earningsData.highestDayEarnings || 0,
-        highestDayEarningsDate: earningsData.highestDayEarningsDate || '',
         todayEarningsINR: todayEarnings,
         // Popularity (from users doc)
         favoritedByCount: rawData.favoritedByCount || 0,

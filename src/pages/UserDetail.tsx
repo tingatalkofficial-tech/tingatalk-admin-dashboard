@@ -296,7 +296,7 @@ const UserDetailPage: React.FC = () => {
                 <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">
                   💰 Earnings Overview
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[16px]">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px]">
                   <div className="flex flex-col gap-[8px] p-[16px] rounded-[12px] border border-[#e4e6e5] bg-white">
                     <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">Total Earnings (INR)</span>
                     <span className="font-['Urbanist'] text-[24px] font-bold text-[#232d2c]">
@@ -307,6 +307,12 @@ const UserDetailPage: React.FC = () => {
                     <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">Available Balance (INR)</span>
                     <span className="font-['Urbanist'] text-[24px] font-bold text-[#1e4841]">
                       ₹{user.femaleAdminData.availableBalanceINR.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-[8px] p-[16px] rounded-[12px] border border-orange-200 bg-orange-50">
+                    <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">Pending Payout (INR)</span>
+                    <span className="font-['Urbanist'] text-[24px] font-bold text-orange-600">
+                      ₹{user.femaleAdminData.pendingAmountINR.toFixed(2)}
                     </span>
                   </div>
                   <div className="flex flex-col gap-[8px] p-[16px] rounded-[12px] border border-[#e4e6e5] bg-white">

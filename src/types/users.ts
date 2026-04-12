@@ -9,6 +9,11 @@ export interface User {
   dailyRewardCount?: number;
   profileImage?: string;
   phoneNumber?: string;
+  isOnline?: boolean;
+  isVerified?: boolean;
+  totalEarnings?: number;
+  totalCalls?: number;
+  coins?: number;
 }
 
 export interface FemaleEarnings {
@@ -72,26 +77,25 @@ export interface FemaleUserAdmin {
   age: number;
   joinedAt: any;
   lastActiveAt: any;
-  
+
   // Rating
   rating: number;
   totalLikes: number;
   totalDislikes: number;
-  
+
   // Calls
   totalCallsReceived: number;
   totalCallDurationMinutes: number;
   totalVideoCallsReceived: number;
   totalAudioCallsReceived: number;
-  
+
   // Earnings
   totalEarningsINR: number;
   availableBalanceINR: number;
+  pendingAmountINR: number;
   claimedAmountINR: number;
-  highestDayEarningsINR: number;
-  highestDayEarningsDate: string;
   todayEarningsINR: number;
-  
+
   // Popularity
   favoritedByCount: number;
 }

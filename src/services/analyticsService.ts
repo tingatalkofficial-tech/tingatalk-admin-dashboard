@@ -174,10 +174,11 @@ export const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
 
     const result: AnalyticsData = {
       // Financial data - recalculated on read for accuracy
-      totalEarnings: Math.round(financialStats.totalRevenue * 100) / 100,        // Coin Revenue
-      audioCallEarnings: Math.round(financialStats.netProfit * 100) / 100,       // Net Profit
-      videoCallEarnings: Math.round(financialStats.pendingPayouts * 100) / 100,  // Pending Payouts
-      coinPurchaseEarnings: Math.round(financialStats.trueProfit * 100) / 100,   // Actual Profit
+      totalRevenue: Math.round(financialStats.totalRevenue * 100) / 100,
+      netProfit: Math.round(financialStats.netProfit * 100) / 100,
+      pendingPayouts: Math.round(financialStats.pendingPayouts * 100) / 100,
+      actualProfit: Math.round((financialStats.trueProfit ?? 0) * 100) / 100,
+      todayRevenue: Math.round((rawFinancial.todayRevenue || 0) * 100) / 100,
 
       // Call statistics
       totalCalls: callStats.totalCompletedCalls,

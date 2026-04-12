@@ -127,6 +127,27 @@ const CallsManagement: React.FC = () => {
 
           {callStats && (
             <>
+              {/* Today's Stats */}
+              <div className="flex flex-col gap-[12px]">
+                <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">
+                  📅 Today's Activity
+                </h2>
+                <div className="flex flex-wrap gap-[18px]">
+                  <StatCard
+                    label="Calls Today"
+                    value={callStats.callsToday}
+                    icon="📞"
+                    bgColor="bg-gradient-to-br from-blue-50 to-blue-100"
+                  />
+                  <StatCard
+                    label="Duration Today"
+                    value={formatDuration(callStats.callDurationTodayMinutes)}
+                    icon="⏱️"
+                    bgColor="bg-gradient-to-br from-purple-50 to-purple-100"
+                  />
+                </div>
+              </div>
+
               {/* Total Call Statistics */}
               <div className="flex flex-col gap-[12px]">
                 <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">

@@ -24,10 +24,11 @@ interface AnalyticsProviderProps {
 }
 
 const initialData: AnalyticsData = {
-  totalEarnings: 0,
-  audioCallEarnings: 0,
-  videoCallEarnings: 0,
-  coinPurchaseEarnings: 0,
+  totalRevenue: 0,
+  netProfit: 0,
+  pendingPayouts: 0,
+  actualProfit: 0,
+  todayRevenue: 0,
   totalCalls: 0,
   totalAudioCalls: 0,
   totalVideoCalls: 0,

@@ -14,28 +14,28 @@ const AnalyticsDashboard: React.FC = () => {
     {
       id: '1',
       label: 'Coin Revenue',
-      amount: analyticsData.totalEarnings,
+      amount: analyticsData.totalRevenue,
       icon: '🪙',
       currency: 'INR'
     },
     {
       id: '2',
       label: 'Net Profit',
-      amount: analyticsData.audioCallEarnings,
+      amount: analyticsData.netProfit,
       icon: '💰',
       currency: 'INR'
     },
     {
       id: '3',
       label: 'Pending Payouts',
-      amount: analyticsData.videoCallEarnings,
+      amount: analyticsData.pendingPayouts,
       icon: '⏳',
       currency: 'INR'
     },
     {
       id: '4',
       label: 'Actual Profit',
-      amount: analyticsData.coinPurchaseEarnings,
+      amount: analyticsData.actualProfit,
       icon: '💎',
       currency: 'INR'
     }
