@@ -3,15 +3,14 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
-// Firebase configuration
-// TODO: Get your actual config from Firebase Console > Project Settings > General
+// Firebase configuration (client-side keys — safe to commit)
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "YOUR_API_KEY",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "tingatalk-53057.firebaseapp.com",
+  apiKey: "AIzaSyDGIHRWxDzVCpUhwqiX3ic7a0CP5sUjL3c",
+  authDomain: "tingatalk-53057.firebaseapp.com",
   projectId: "tingatalk-53057",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "tingatalk-53057.appspot.com",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "YOUR_SENDER_ID",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "YOUR_APP_ID"
+  storageBucket: "tingatalk-53057.firebasestorage.app",
+  messagingSenderId: "462676704637",
+  appId: "1:462676704637:web:52de781bba225bb88c6014",
 };
 
 // Initialize Firebase
