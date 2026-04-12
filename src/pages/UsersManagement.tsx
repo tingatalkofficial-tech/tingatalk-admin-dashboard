@@ -16,6 +16,9 @@ const UsersManagement: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [dateFilter, setDateFilter] = useState(searchParams.get('date') || '');
+  const [minAge, setMinAge] = useState(searchParams.get('minAge') || '');
+  const [maxAge, setMaxAge] = useState(searchParams.get('maxAge') || '');
 
   useEffect(() => {
     loadUsers();
@@ -23,7 +26,7 @@ const UsersManagement: React.FC = () => {
 
   useEffect(() => {
     filterUsers();
-  }, [users, selectedGender, searchQuery]);
+  }, [users, selectedGender, searchQuery, dateFilter, minAge, maxAge]);
 
   const loadUsers = async () => {
     setIsLoading(true);
@@ -38,40 +41,98 @@ const UsersManagement: React.FC = () => {
     }
   };
 
+  const toDateString = (timestamp: any): string => {
+    if (!timestamp) return '';
+    try {
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      return date.toISOString().split('T')[0];
+    } catch {
+      return '';
+    }
+  };
+
   const filterUsers = () => {
     let filtered = users;
 
-    // Filter by gender
     if (selectedGender !== 'all') {
       filtered = filtered.filter(u => u.gender === selectedGender);
     }
 
-    // Filter by search query
     if (searchQuery) {
+      const q = searchQuery.toLowerCase();
       filtered = filtered.filter(u =>
-        u.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.id.toLowerCase().includes(searchQuery.toLowerCase())
+        u.displayName.toLowerCase().includes(q) ||
+        u.id.toLowerCase().includes(q) ||
+        (u.phoneNumber && u.phoneNumber.includes(q))
       );
+    }
+
+    if (dateFilter) {
+      filtered = filtered.filter(u => toDateString(u.createdAt) === dateFilter);
+    }
+
+    if (minAge) {
+      const min = parseInt(minAge, 10);
+      if (!isNaN(min)) filtered = filtered.filter(u => (u.age || 0) >= min);
+    }
+
+    if (maxAge) {
+      const max = parseInt(maxAge, 10);
+      if (!isNaN(max)) filtered = filtered.filter(u => (u.age || 0) <= max);
     }
 
     setFilteredUsers(filtered);
   };
 
+  const syncParams = (overrides: Record<string, string> = {}) => {
+    const vals: Record<string, string> = {
+      ...(selectedGender !== 'all' ? { gender: selectedGender } : {}),
+      ...(searchQuery ? { q: searchQuery } : {}),
+      ...(dateFilter ? { date: dateFilter } : {}),
+      ...(minAge ? { minAge } : {}),
+      ...(maxAge ? { maxAge } : {}),
+      ...overrides,
+    };
+    // Remove empty keys
+    Object.keys(vals).forEach(k => { if (!vals[k]) delete vals[k]; });
+    setSearchParams(vals, { replace: true });
+  };
+
   const handleGenderChange = (gender: 'all' | 'male' | 'female') => {
     setSelectedGender(gender);
-    const params: Record<string, string> = {};
-    if (gender !== 'all') params.gender = gender;
-    if (searchQuery) params.q = searchQuery;
-    setSearchParams(params, { replace: true });
+    syncParams({ gender: gender === 'all' ? '' : gender });
   };
 
   const handleSearchChange = (q: string) => {
     setSearchQuery(q);
-    const params: Record<string, string> = {};
-    if (selectedGender !== 'all') params.gender = selectedGender;
-    if (q) params.q = q;
-    setSearchParams(params, { replace: true });
+    syncParams({ q });
   };
+
+  const handleDateChange = (date: string) => {
+    setDateFilter(date);
+    syncParams({ date });
+  };
+
+  const handleMinAgeChange = (val: string) => {
+    setMinAge(val);
+    syncParams({ minAge: val });
+  };
+
+  const handleMaxAgeChange = (val: string) => {
+    setMaxAge(val);
+    syncParams({ maxAge: val });
+  };
+
+  const clearFilters = () => {
+    setDateFilter('');
+    setMinAge('');
+    setMaxAge('');
+    setSearchQuery('');
+    setSelectedGender('all');
+    setSearchParams({}, { replace: true });
+  };
+
+  const hasActiveFilters = dateFilter || minAge || maxAge || searchQuery;
 
   const handleUserClick = (userId: string) => {
     navigate(`/users/${userId}`);
@@ -143,17 +204,6 @@ const UsersManagement: React.FC = () => {
             </div>
           )}
 
-          {/* Search Bar */}
-          <div className="flex w-full">
-            <input
-              type="text"
-              placeholder="Search by name or ID..."
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="flex-1 px-[16px] py-[12px] rounded-[8px] border border-[#e4e6e5] font-['Urbanist'] text-[14px] focus:outline-none focus:border-[#1e4841]"
-            />
-          </div>
-
           {/* Gender Filter Toggle */}
           <div className="flex gap-[8px] p-[4px] bg-[#ecf4e9] rounded-[8px] w-fit">
             <button
@@ -174,7 +224,7 @@ const UsersManagement: React.FC = () => {
                   : 'bg-transparent text-[#232d2c] hover:bg-white'
               }`}
             >
-              👨 Male ({maleCount})
+              Male ({maleCount})
             </button>
             <button
               onClick={() => handleGenderChange('female')}
@@ -184,9 +234,92 @@ const UsersManagement: React.FC = () => {
                   : 'bg-transparent text-[#232d2c] hover:bg-white'
               }`}
             >
-              👩 Female ({femaleCount})
+              Female ({femaleCount})
             </button>
           </div>
+
+          {/* Filters Row */}
+          <div className="flex flex-wrap items-end gap-[12px] p-[16px] bg-white rounded-[12px] border border-[#e4e6e5]">
+            {/* Search */}
+            <div className="flex flex-col gap-[4px] flex-1 min-w-[200px]">
+              <label className="font-['Urbanist'] text-[12px] font-medium text-[#6b7270] uppercase tracking-wider">
+                Search
+              </label>
+              <input
+                type="text"
+                placeholder="Name, ID, or phone..."
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="px-[12px] py-[10px] rounded-[8px] border border-[#e4e6e5] font-['Urbanist'] text-[14px] focus:outline-none focus:border-[#1e4841]"
+              />
+            </div>
+
+            {/* Date Filter */}
+            <div className="flex flex-col gap-[4px] min-w-[160px]">
+              <label className="font-['Urbanist'] text-[12px] font-medium text-[#6b7270] uppercase tracking-wider">
+                Joined Date
+              </label>
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => handleDateChange(e.target.value)}
+                className="px-[12px] py-[10px] rounded-[8px] border border-[#e4e6e5] font-['Urbanist'] text-[14px] focus:outline-none focus:border-[#1e4841]"
+              />
+            </div>
+
+            {/* Age Range */}
+            <div className="flex flex-col gap-[4px]">
+              <label className="font-['Urbanist'] text-[12px] font-medium text-[#6b7270] uppercase tracking-wider">
+                Age Range
+              </label>
+              <div className="flex items-center gap-[6px]">
+                <input
+                  type="number"
+                  placeholder="Min"
+                  value={minAge}
+                  onChange={(e) => handleMinAgeChange(e.target.value)}
+                  min="0"
+                  max="100"
+                  className="w-[70px] px-[10px] py-[10px] rounded-[8px] border border-[#e4e6e5] font-['Urbanist'] text-[14px] focus:outline-none focus:border-[#1e4841]"
+                />
+                <span className="font-['Urbanist'] text-[14px] text-[#6b7270]">to</span>
+                <input
+                  type="number"
+                  placeholder="Max"
+                  value={maxAge}
+                  onChange={(e) => handleMaxAgeChange(e.target.value)}
+                  min="0"
+                  max="100"
+                  className="w-[70px] px-[10px] py-[10px] rounded-[8px] border border-[#e4e6e5] font-['Urbanist'] text-[14px] focus:outline-none focus:border-[#1e4841]"
+                />
+              </div>
+            </div>
+
+            {/* Clear Filters */}
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="px-[14px] py-[10px] rounded-[8px] border border-[#e4e6e5] font-['Urbanist'] text-[13px] font-medium text-[#6b7270] hover:bg-[#ecf4e9] transition-colors"
+              >
+                Clear All
+              </button>
+            )}
+          </div>
+
+          {/* Results Count */}
+          <p className="font-['Urbanist'] text-[13px] text-[#6b7270]">
+            Showing {filteredUsers.length} of {users.length} users
+            {dateFilter && (
+              <span className="ml-[4px] px-[8px] py-[2px] bg-[#ecf4e9] rounded-[4px] text-[#1e4841] font-medium">
+                joined {new Date(dateFilter + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+              </span>
+            )}
+            {(minAge || maxAge) && (
+              <span className="ml-[4px] px-[8px] py-[2px] bg-[#ecf4e9] rounded-[4px] text-[#1e4841] font-medium">
+                age {minAge || '0'}-{maxAge || '100'}
+              </span>
+            )}
+          </p>
 
           {/* Users Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px]">
@@ -205,7 +338,7 @@ const UsersManagement: React.FC = () => {
                   No users found
                 </p>
                 <p className="font-['Urbanist'] text-[14px] text-[#6b7270] mt-[8px]">
-                  {searchQuery ? 'Try a different search term' : 'No users available'}
+                  {hasActiveFilters ? 'Try adjusting your filters' : 'No users available'}
                 </p>
               </div>
             )}
