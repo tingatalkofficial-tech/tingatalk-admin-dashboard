@@ -26,7 +26,9 @@ const Sidebar: React.FC = () => {
       where('isVerified', '==', false)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setUnverifiedCount(snapshot.size);
+      // Exclude already-rejected users from the badge count
+      const pendingCount = snapshot.docs.filter(d => d.data().verificationStatus !== 'rejected').length;
+      setUnverifiedCount(pendingCount);
     }, (err) => {
       console.error('Error listening to unverified count:', err);
     });

@@ -19,15 +19,21 @@ export const fetchUnverifiedFemales = async (): Promise<UnverifiedUser[]> => {
       where('isVerified', '==', false)
     );
     const snapshot = await getDocs(q);
-    const users: UnverifiedUser[] = snapshot.docs.map(d => ({
-      id: d.id,
-      displayName: d.data().displayName || d.data().name || 'Unknown',
-      phoneNumber: d.data().phoneNumber || 'N/A',
-      age: d.data().age,
-      verificationPhoto: d.data().verificationPhoto,
-      verificationStatus: d.data().verificationStatus,
-      createdAt: d.data().createdAt,
-    }));
+    const users: UnverifiedUser[] = snapshot.docs
+      .filter(d => {
+        // Exclude already-rejected users — they still have isVerified=false
+        const status = d.data().verificationStatus;
+        return status !== 'rejected';
+      })
+      .map(d => ({
+        id: d.id,
+        displayName: d.data().displayName || d.data().name || 'Unknown',
+        phoneNumber: d.data().phoneNumber || 'N/A',
+        age: d.data().age,
+        verificationPhoto: d.data().verificationPhoto,
+        verificationStatus: d.data().verificationStatus,
+        createdAt: d.data().createdAt,
+      }));
 
     console.log(`Fetched ${users.length} unverified female users`);
     return users;

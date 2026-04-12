@@ -127,35 +127,14 @@ const CallsManagement: React.FC = () => {
 
           {callStats && (
             <>
-              {/* Today's Stats */}
+              {/* Overview */}
               <div className="flex flex-col gap-[12px]">
                 <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">
-                  📅 Today's Activity
+                  📈 Overview
                 </h2>
                 <div className="flex flex-wrap gap-[18px]">
                   <StatCard
-                    label="Calls Today"
-                    value={callStats.callsToday}
-                    icon="📞"
-                    bgColor="bg-gradient-to-br from-blue-50 to-blue-100"
-                  />
-                  <StatCard
-                    label="Duration Today"
-                    value={formatDuration(callStats.callDurationTodayMinutes)}
-                    icon="⏱️"
-                    bgColor="bg-gradient-to-br from-purple-50 to-purple-100"
-                  />
-                </div>
-              </div>
-
-              {/* Total Call Statistics */}
-              <div className="flex flex-col gap-[12px]">
-                <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">
-                  📈 Total Call Statistics
-                </h2>
-                <div className="flex flex-wrap gap-[18px]">
-                  <StatCard
-                    label="Total Calls"
+                    label="Total Calls Initiated"
                     value={callStats.totalCalls}
                     icon="📊"
                     bgColor="bg-gradient-to-br from-green-50 to-green-100"
@@ -166,35 +145,23 @@ const CallsManagement: React.FC = () => {
                     icon="✅"
                     bgColor="bg-gradient-to-br from-emerald-50 to-emerald-100"
                   />
-                  <StatCard
-                    label="Declined Calls"
-                    value={callStats.totalDeclinedCalls}
-                    icon="❌"
-                    bgColor="bg-gradient-to-br from-red-50 to-red-100"
-                  />
-                  <StatCard
-                    label="Failed Calls"
-                    value={callStats.totalFailedCalls}
-                    icon="⚠️"
-                    bgColor="bg-gradient-to-br from-orange-50 to-orange-100"
-                  />
                 </div>
               </div>
 
-              {/* Call Types */}
+              {/* Call Breakdown */}
               <div className="flex flex-col gap-[12px]">
                 <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">
-                  🎯 Call Types
+                  🎯 Call Breakdown
                 </h2>
                 <div className="flex flex-wrap gap-[18px]">
                   <StatCard
-                    label="Audio Calls Completed"
+                    label="Audio Calls"
                     value={callStats.totalAudioCallsCompleted}
                     icon="🎧"
                     bgColor="bg-gradient-to-br from-indigo-50 to-indigo-100"
                   />
                   <StatCard
-                    label="Video Calls Completed"
+                    label="Video Calls"
                     value={callStats.totalVideoCallsCompleted}
                     icon="🎥"
                     bgColor="bg-gradient-to-br from-pink-50 to-pink-100"
@@ -202,10 +169,10 @@ const CallsManagement: React.FC = () => {
                 </div>
               </div>
 
-              {/* Duration Statistics */}
+              {/* Duration */}
               <div className="flex flex-col gap-[12px]">
                 <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">
-                  ⏰ Duration Statistics
+                  ⏰ Duration
                 </h2>
                 <div className="flex flex-wrap gap-[18px]">
                   <StatCard
