@@ -101,11 +101,11 @@ const PayoutsPage: React.FC = () => {
         action === 'complete' ? transactionId || undefined : undefined
       );
 
-      // Update female_earnings balances
+      // Update female_earnings + users doc balances
       if (action === 'complete') {
-        await updateFemaleEarningsOnApproval(payout.userId, payout.amount);
+        await updateFemaleEarningsOnApproval(payout.userId, payout.id, payout.amount);
       } else if (action === 'reject') {
-        await updateFemaleEarningsOnRejection(payout.userId, payout.amount);
+        await updateFemaleEarningsOnRejection(payout.userId, payout.id, payout.amount);
       }
 
       // Update local state

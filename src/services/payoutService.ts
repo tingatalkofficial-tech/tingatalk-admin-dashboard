@@ -82,11 +82,13 @@ export const updatePayoutStatus = async (
 
 export const updateFemaleEarningsOnApproval = async (
   userId: string,
+  payoutRequestId: string,
   amount: number
 ): Promise<void> => {
   try {
     const { runTransaction } = await import('firebase/firestore');
     const earningsRef = doc(db, 'female_earnings', userId);
+    const userPayoutRef = doc(db, 'users', userId, 'payouts', payoutRequestId);
 
     await runTransaction(db, async (transaction) => {
       const earningsDoc = await transaction.get(earningsRef);
@@ -97,11 +99,23 @@ export const updateFemaleEarningsOnApproval = async (
       const currentPending = data.pendingAmount || 0;
       const currentClaimed = data.claimedAmount || 0;
 
+      // Update female_earnings: move from pending to claimed
       transaction.update(earningsRef, {
         pendingAmount: Math.max(0, currentPending - amount),
         claimedAmount: currentClaimed + amount,
         lastUpdated: Timestamp.now(),
       });
+
+      // Update users/{userId}/payouts/{id} status
+      try {
+        transaction.update(userPayoutRef, {
+          status: 'completed',
+          updatedAt: Timestamp.now(),
+        });
+      } catch (e) {
+        // Subcollection doc may not exist if created via backend API only
+        console.warn('Could not update user payout subcollection doc:', e);
+      }
     });
     console.log(`Female earnings updated for ${userId}: moved ${amount} from pending to claimed`);
   } catch (error) {
@@ -112,26 +126,57 @@ export const updateFemaleEarningsOnApproval = async (
 
 export const updateFemaleEarningsOnRejection = async (
   userId: string,
+  payoutRequestId: string,
   amount: number
 ): Promise<void> => {
   try {
     const { runTransaction } = await import('firebase/firestore');
     const earningsRef = doc(db, 'female_earnings', userId);
+    const userDocRef = doc(db, 'users', userId);
+    const userPayoutRef = doc(db, 'users', userId, 'payouts', payoutRequestId);
 
     await runTransaction(db, async (transaction) => {
-      const earningsDoc = await transaction.get(earningsRef);
+      const [earningsDoc, userDoc] = await Promise.all([
+        transaction.get(earningsRef),
+        transaction.get(userDocRef),
+      ]);
+
       if (!earningsDoc.exists()) {
         throw new Error('Female earnings document not found');
       }
-      const data = earningsDoc.data();
-      const currentPending = data.pendingAmount || 0;
-      const currentAvailable = data.availableBalance || 0;
 
+      const earningsData = earningsDoc.data();
+      const currentPending = earningsData.pendingAmount || 0;
+      const currentAvailable = earningsData.availableBalance || 0;
+
+      // Restore female_earnings: move from pending back to available
       transaction.update(earningsRef, {
         pendingAmount: Math.max(0, currentPending - amount),
         availableBalance: currentAvailable + amount,
         lastUpdated: Timestamp.now(),
       });
+
+      // Also restore users/{userId} balance fields (mobile app reads from here)
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const userAvailable = userData.availableBalance || 0;
+        const userClaimed = userData.claimedAmount || 0;
+
+        transaction.update(userDocRef, {
+          availableBalance: userAvailable + amount,
+          claimedAmount: Math.max(0, userClaimed - amount),
+        });
+      }
+
+      // Update users/{userId}/payouts/{id} status
+      try {
+        transaction.update(userPayoutRef, {
+          status: 'rejected',
+          updatedAt: Timestamp.now(),
+        });
+      } catch (e) {
+        console.warn('Could not update user payout subcollection doc:', e);
+      }
     });
     console.log(`Female earnings updated for ${userId}: restored ${amount} from pending to available`);
   } catch (error) {
