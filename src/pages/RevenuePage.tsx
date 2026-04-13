@@ -116,10 +116,13 @@ const RevenuePage: React.FC = () => {
                   <div className="flex flex-col gap-[8px] p-[24px] rounded-[16px] border border-[#e4e6e5] bg-white">
                     <div className="flex items-center gap-[8px]">
                       <span className="text-[28px]">💸</span>
-                      <span className="font-['Urbanist'] text-[13px] text-[#6b7270] font-medium">Total Payouts</span>
+                      <span className="font-['Urbanist'] text-[13px] text-[#6b7270] font-medium">Completed Payouts</span>
                     </div>
                     <span className="font-['Urbanist'] text-[32px] font-bold text-[#232d2c]">
-                      {formatCurrency(stats.totalPayouts)}
+                      {stats.completedPayoutsCount}
+                    </span>
+                    <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">
+                      {formatCurrency(stats.completedPayoutsAmount)} paid out
                     </span>
                   </div>
 
@@ -152,10 +155,10 @@ const RevenuePage: React.FC = () => {
                       <span className="font-['Urbanist'] text-[13px] text-[#6b7270] font-medium">Pending Payouts</span>
                     </div>
                     <span className="font-['Urbanist'] text-[32px] font-bold text-orange-600">
-                      {formatCurrency(stats.pendingPayouts)}
+                      {stats.pendingPayoutsCount}
                     </span>
                     <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">
-                      Payout requests waiting for approval
+                      {formatCurrency(stats.pendingPayoutsAmount)} waiting for approval
                     </span>
                   </div>
 

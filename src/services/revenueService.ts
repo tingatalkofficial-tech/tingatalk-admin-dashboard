@@ -3,8 +3,10 @@ import { db } from '../utils/firebase';
 
 export interface RevenueStats {
   totalRevenue: number;
-  totalPayouts: number;
-  pendingPayouts: number;
+  completedPayoutsCount: number;
+  completedPayoutsAmount: number;
+  pendingPayoutsCount: number;
+  pendingPayoutsAmount: number;
   actualProfit: number;
   femaleWalletBalance: number;
   lastUpdated: any;
@@ -12,23 +14,29 @@ export interface RevenueStats {
 
 export const fetchRevenueStats = async (): Promise<RevenueStats> => {
   try {
-    const [financialDoc, pendingPayoutsSnapshot, femaleEarningsSnapshot] = await Promise.all([
+    const [financialDoc, allPayoutsSnapshot, femaleEarningsSnapshot] = await Promise.all([
       getDoc(doc(db, 'admin_analytics', 'financial_stats')),
-      getDocs(query(
-        collection(db, 'payout_requests'),
-        where('status', '==', 'pending')
-      )),
+      getDocs(collection(db, 'payout_requests')),
       getDocs(collection(db, 'female_earnings')),
     ]);
 
     const data = financialDoc.exists() ? financialDoc.data() : {};
     const totalRevenue = data.totalRevenue || 0;
-    const totalPayouts = data.totalPayouts || 0;
 
-    // Live pending payouts from actual payout_requests
-    let pendingPayouts = 0;
-    pendingPayoutsSnapshot.docs.forEach(d => {
-      pendingPayouts += d.data().amount || 0;
+    // Compute payout stats from actual payout_requests
+    let completedPayoutsCount = 0;
+    let completedPayoutsAmount = 0;
+    let pendingPayoutsCount = 0;
+    let pendingPayoutsAmount = 0;
+    allPayoutsSnapshot.docs.forEach(d => {
+      const payout = d.data();
+      if (payout.status === 'completed') {
+        completedPayoutsCount++;
+        completedPayoutsAmount += payout.amount || 0;
+      } else if (payout.status === 'pending' || payout.status === 'processing') {
+        pendingPayoutsCount++;
+        pendingPayoutsAmount += payout.amount || 0;
+      }
     });
 
     // Female wallet: sum of availableBalance across all female_earnings docs
@@ -39,9 +47,11 @@ export const fetchRevenueStats = async (): Promise<RevenueStats> => {
 
     const stats: RevenueStats = {
       totalRevenue,
-      totalPayouts,
-      pendingPayouts,
-      actualProfit: totalRevenue - totalPayouts - pendingPayouts,
+      completedPayoutsCount,
+      completedPayoutsAmount,
+      pendingPayoutsCount,
+      pendingPayoutsAmount,
+      actualProfit: totalRevenue - completedPayoutsAmount - pendingPayoutsAmount,
       femaleWalletBalance: Math.round(femaleWalletBalance * 100) / 100,
       lastUpdated: data.lastUpdated || null,
     };
