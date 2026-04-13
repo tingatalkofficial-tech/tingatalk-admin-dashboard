@@ -61,10 +61,10 @@ const RevenuePage: React.FC = () => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-[12px]">
             <div className="flex flex-col gap-[8px]">
               <h1 className="font-['Urbanist'] text-[24px] md:text-[28px] font-bold text-[#232d2c]">
-                💰 Revenue Management
+                Revenue Management
               </h1>
               <p className="font-['Urbanist'] text-[14px] text-[#6b7270]">
-                Track revenue and financial performance
+                Financial overview and profit tracking
               </p>
             </div>
             <button
@@ -95,187 +95,85 @@ const RevenuePage: React.FC = () => {
 
           {stats && (
             <>
-              {/* Revenue Overview */}
+              {/* Revenue Cards */}
               <div className="flex flex-col gap-[12px]">
                 <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">
                   💵 Revenue Overview
                 </h2>
-                <div className="flex flex-wrap gap-[18px]">
-                  <div className="flex flex-col gap-[8px] p-[20px] rounded-[16px] border border-[#e4e6e5] bg-white min-w-[200px] flex-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[18px]">
+                  {/* Total Revenue */}
+                  <div className="flex flex-col gap-[8px] p-[24px] rounded-[16px] border border-[#e4e6e5] bg-white">
                     <div className="flex items-center gap-[8px]">
-                      <span className="text-[24px]">🪙</span>
-                      <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">Total Revenue</span>
+                      <span className="text-[28px]">🪙</span>
+                      <span className="font-['Urbanist'] text-[13px] text-[#6b7270] font-medium">Total Revenue</span>
                     </div>
-                    <span className="font-['Urbanist'] text-[28px] font-bold text-[#232d2c]">
+                    <span className="font-['Urbanist'] text-[32px] font-bold text-[#232d2c]">
                       {formatCurrency(stats.totalRevenue)}
                     </span>
                   </div>
 
-                  <div className="flex flex-col gap-[8px] p-[20px] rounded-[16px] border border-[#e4e6e5] bg-white min-w-[200px] flex-1">
+                  {/* Total Payouts */}
+                  <div className="flex flex-col gap-[8px] p-[24px] rounded-[16px] border border-[#e4e6e5] bg-white">
                     <div className="flex items-center gap-[8px]">
-                      <span className="text-[24px]">💰</span>
-                      <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">Net Profit</span>
+                      <span className="text-[28px]">💸</span>
+                      <span className="font-['Urbanist'] text-[13px] text-[#6b7270] font-medium">Total Payouts</span>
                     </div>
-                    <span className="font-['Urbanist'] text-[28px] font-bold text-[#232d2c]">
-                      {formatCurrency(stats.netProfit)}
+                    <span className="font-['Urbanist'] text-[32px] font-bold text-[#232d2c]">
+                      {formatCurrency(stats.totalPayouts)}
                     </span>
                   </div>
 
-                  <div className="flex flex-col gap-[8px] p-[20px] rounded-[16px] border border-[#e4e6e5] bg-white min-w-[200px] flex-1">
+                  {/* Actual Profit */}
+                  <div className="flex flex-col gap-[8px] p-[24px] rounded-[16px] border-2 border-[#1e4841] bg-[#ecf4e9]">
                     <div className="flex items-center gap-[8px]">
-                      <span className="text-[24px]">⏳</span>
-                      <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">Pending Payouts</span>
+                      <span className="text-[28px]">💰</span>
+                      <span className="font-['Urbanist'] text-[13px] text-[#1e4841] font-medium">Actual Profit</span>
                     </div>
-                    <span className="font-['Urbanist'] text-[28px] font-bold text-[#232d2c]">
-                      {formatCurrency(stats.pendingPayouts)}
+                    <span className="font-['Urbanist'] text-[32px] font-bold text-[#1e4841]">
+                      {formatCurrency(stats.actualProfit)}
                     </span>
-                  </div>
-
-                  <div className="flex flex-col gap-[8px] p-[20px] rounded-[16px] border border-[#e4e6e5] bg-white min-w-[200px] flex-1">
-                    <div className="flex items-center gap-[8px]">
-                      <span className="text-[24px]">💎</span>
-                      <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">Actual Profit</span>
-                    </div>
-                    <span className="font-['Urbanist'] text-[28px] font-bold text-[#232d2c]">
-                      {formatCurrency(stats.trueProfit)}
+                    <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">
+                      Revenue - Payouts - Pending
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Revenue Breakdown */}
+              {/* Pending Payouts + Female Wallet */}
               <div className="flex flex-col gap-[12px]">
                 <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">
-                  📅 Revenue Breakdown
+                  👛 Wallet & Payouts
                 </h2>
-                <div className="bg-white rounded-[16px] border border-[#e4e6e5] overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-[#ecf4e9]">
-                        <tr>
-                          <th className="px-[16px] py-[12px] text-left font-['Urbanist'] text-[14px] font-semibold text-[#232d2c]">
-                            Period
-                          </th>
-                          <th className="px-[16px] py-[12px] text-right font-['Urbanist'] text-[14px] font-semibold text-[#232d2c]">
-                            Revenue
-                          </th>
-                          <th className="px-[16px] py-[12px] text-right font-['Urbanist'] text-[14px] font-semibold text-[#232d2c]">
-                            Payouts
-                          </th>
-                          <th className="px-[16px] py-[12px] text-right font-['Urbanist'] text-[14px] font-semibold text-[#232d2c]">
-                            Profit
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="border-t border-[#e4e6e5] hover:bg-[#fbfbfc] transition-colors">
-                          <td className="px-[16px] py-[14px]">
-                            <span className="font-['Urbanist'] text-[14px] font-semibold text-[#232d2c]">Today</span>
-                          </td>
-                          <td className="px-[16px] py-[14px] text-right">
-                            <span className="font-['Urbanist'] text-[14px] font-semibold text-[#1e4841]">
-                              {formatCurrency(stats.todayRevenue)}
-                            </span>
-                          </td>
-                          <td className="px-[16px] py-[14px] text-right">
-                            <span className="font-['Urbanist'] text-[14px] text-[#6b7270]">
-                              {formatCurrency(stats.todayPayouts)}
-                            </span>
-                          </td>
-                          <td className="px-[16px] py-[14px] text-right">
-                            <span className="font-['Urbanist'] text-[14px] font-semibold text-[#232d2c]">
-                              {formatCurrency(stats.todayRevenue - stats.todayPayouts)}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr className="border-t border-[#e4e6e5] hover:bg-[#fbfbfc] transition-colors bg-gray-50">
-                          <td className="px-[16px] py-[14px]">
-                            <span className="font-['Urbanist'] text-[14px] font-semibold text-[#232d2c]">This Week</span>
-                          </td>
-                          <td className="px-[16px] py-[14px] text-right">
-                            <span className="font-['Urbanist'] text-[14px] font-semibold text-[#1e4841]">
-                              {formatCurrency(stats.thisWeekRevenue)}
-                            </span>
-                          </td>
-                          <td className="px-[16px] py-[14px] text-right">
-                            <span className="font-['Urbanist'] text-[14px] text-[#6b7270]">
-                              {formatCurrency(stats.thisWeekPayouts)}
-                            </span>
-                          </td>
-                          <td className="px-[16px] py-[14px] text-right">
-                            <span className="font-['Urbanist'] text-[14px] font-semibold text-[#232d2c]">
-                              {formatCurrency(stats.thisWeekRevenue - stats.thisWeekPayouts)}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr className="border-t border-[#e4e6e5] hover:bg-[#fbfbfc] transition-colors">
-                          <td className="px-[16px] py-[14px]">
-                            <span className="font-['Urbanist'] text-[14px] font-semibold text-[#232d2c]">This Month</span>
-                          </td>
-                          <td className="px-[16px] py-[14px] text-right">
-                            <span className="font-['Urbanist'] text-[14px] font-semibold text-[#1e4841]">
-                              {formatCurrency(stats.thisMonthRevenue)}
-                            </span>
-                          </td>
-                          <td className="px-[16px] py-[14px] text-right">
-                            <span className="font-['Urbanist'] text-[14px] text-[#6b7270]">
-                              {formatCurrency(stats.thisMonthPayouts)}
-                            </span>
-                          </td>
-                          <td className="px-[16px] py-[14px] text-right">
-                            <span className="font-['Urbanist'] text-[14px] font-semibold text-[#232d2c]">
-                              {formatCurrency(stats.thisMonthRevenue - stats.thisMonthPayouts)}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr className="border-t-2 border-[#1e4841] hover:bg-[#fbfbfc] transition-colors bg-[#ecf4e9]">
-                          <td className="px-[16px] py-[14px]">
-                            <span className="font-['Urbanist'] text-[14px] font-bold text-[#1e4841]">All Time</span>
-                          </td>
-                          <td className="px-[16px] py-[14px] text-right">
-                            <span className="font-['Urbanist'] text-[14px] font-bold text-[#1e4841]">
-                              {formatCurrency(stats.totalRevenue)}
-                            </span>
-                          </td>
-                          <td className="px-[16px] py-[14px] text-right">
-                            <span className="font-['Urbanist'] text-[14px] font-semibold text-[#6b7270]">
-                              {formatCurrency(stats.totalPayouts)}
-                            </span>
-                          </td>
-                          <td className="px-[16px] py-[14px] text-right">
-                            <span className="font-['Urbanist'] text-[14px] font-bold text-[#1e4841]">
-                              {formatCurrency(stats.netProfit)}
-                            </span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-[18px]">
+                  {/* Pending Payouts */}
+                  <div className="flex flex-col gap-[8px] p-[24px] rounded-[16px] border border-orange-200 bg-orange-50">
+                    <div className="flex items-center gap-[8px]">
+                      <span className="text-[28px]">⏳</span>
+                      <span className="font-['Urbanist'] text-[13px] text-[#6b7270] font-medium">Pending Payouts</span>
+                    </div>
+                    <span className="font-['Urbanist'] text-[32px] font-bold text-orange-600">
+                      {formatCurrency(stats.pendingPayouts)}
+                    </span>
+                    <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">
+                      Payout requests waiting for approval
+                    </span>
+                  </div>
+
+                  {/* Female Wallet Balance */}
+                  <div className="flex flex-col gap-[8px] p-[24px] rounded-[16px] border border-purple-200 bg-purple-50">
+                    <div className="flex items-center gap-[8px]">
+                      <span className="text-[28px]">👛</span>
+                      <span className="font-['Urbanist'] text-[13px] text-[#6b7270] font-medium">Female Wallet Balance</span>
+                    </div>
+                    <span className="font-['Urbanist'] text-[32px] font-bold text-purple-700">
+                      {formatCurrency(stats.femaleWalletBalance)}
+                    </span>
+                    <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">
+                      Total available balance across all female wallets (yet to be claimed)
+                    </span>
                   </div>
                 </div>
               </div>
-
-              {/* Withdrawal Info */}
-              {(stats.pendingWithdrawalRequests > 0 || stats.pendingWithdrawalAmount > 0) && (
-                <div className="flex flex-col gap-[12px]">
-                  <h2 className="font-['Urbanist'] text-[18px] font-bold text-[#232d2c]">
-                    📤 Pending Withdrawals
-                  </h2>
-                  <div className="flex flex-wrap gap-[18px]">
-                    <div className="flex flex-col gap-[8px] p-[20px] rounded-[16px] border border-orange-200 bg-orange-50 min-w-[200px] flex-1">
-                      <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">Pending Requests</span>
-                      <span className="font-['Urbanist'] text-[28px] font-bold text-[#232d2c]">
-                        {stats.pendingWithdrawalRequests}
-                      </span>
-                    </div>
-                    <div className="flex flex-col gap-[8px] p-[20px] rounded-[16px] border border-orange-200 bg-orange-50 min-w-[200px] flex-1">
-                      <span className="font-['Urbanist'] text-[12px] text-[#6b7270]">Pending Amount</span>
-                      <span className="font-['Urbanist'] text-[28px] font-bold text-[#232d2c]">
-                        {formatCurrency(stats.pendingWithdrawalAmount)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* Last Updated */}
               {stats.lastUpdated && (

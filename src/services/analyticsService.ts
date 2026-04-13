@@ -55,28 +55,30 @@ export const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
   try {
     console.log('🔍 Fetching analytics data from admin_analytics collection...');
 
-    // Fetch admin analytics documents + top earners/callers + live user counts
-    const [userStatsDoc, financialStatsDoc, callStatsDoc, rankingsDoc, topEarnersSnapshot, topCallersSnapshot, allUsersSnapshot] = await Promise.all([
+    // Fetch admin analytics documents + top earners/callers + live user counts + live payouts
+    const [userStatsDoc, financialStatsDoc, callStatsDoc, rankingsDoc, topEarnersSnapshot, topCallersSnapshot, allUsersSnapshot, pendingPayoutsSnapshot] = await Promise.all([
       getDoc(doc(db, 'admin_analytics', 'user_stats')),
       getDoc(doc(db, 'admin_analytics', 'financial_stats')),
       getDoc(doc(db, 'admin_analytics', 'call_stats')),
       getDoc(doc(db, 'rankings', 'by_rating')),
-      // Top earners: query users collection directly (female_earnings data is synced to users doc)
       getDocs(query(
         collection(db, 'users'),
         where('gender', '==', 'female'),
         orderBy('totalEarnings', 'desc'),
         limit(3)
       )),
-      // Top callers: query users collection directly
       getDocs(query(
         collection(db, 'users'),
         where('gender', '==', 'female'),
         orderBy('totalCalls', 'desc'),
         limit(3)
       )),
-      // Fetch all users for accurate live counts
-      getDocs(collection(db, 'users'))
+      getDocs(collection(db, 'users')),
+      // Live pending payouts from payout_requests
+      getDocs(query(
+        collection(db, 'payout_requests'),
+        where('status', '==', 'pending')
+      ))
     ]);
 
     // Extract data with defaults
@@ -104,14 +106,19 @@ export const fetchAnalyticsData = async (): Promise<AnalyticsData> => {
           pendingWithdrawalAmount: 0
         };
 
-    // Always recalculate profits on-read to avoid stale values from dual-write race conditions
+    // Compute live pending payouts from actual payout_requests (pre-aggregated stats are stale)
+    let livePendingPayouts = 0;
+    pendingPayoutsSnapshot.docs.forEach(d => {
+      livePendingPayouts += d.data().amount || 0;
+    });
+
     const totalRevenue = rawFinancial.totalRevenue || 0;
     const totalPayouts = rawFinancial.totalPayouts || 0;
-    const pendingPayouts = rawFinancial.pendingPayouts || 0;
     const financialStats = {
       ...rawFinancial,
+      pendingPayouts: livePendingPayouts,
       netProfit: totalRevenue - totalPayouts,
-      trueProfit: totalRevenue - totalPayouts - pendingPayouts,
+      trueProfit: totalRevenue - totalPayouts - livePendingPayouts,
     };
 
     const callStats = callStatsDoc.exists()
