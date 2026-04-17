@@ -24,16 +24,19 @@ export const fetchUnverifiedFemales = async (): Promise<UnverifiedUser[]> => {
     const snapshot = await getDocs(q);
     const users: UnverifiedUser[] = snapshot.docs
       .filter(d => {
+        const data = d.data();
         // Exclude already-rejected users — they still have isVerified=false
-        const status = d.data().verificationStatus;
-        return status !== 'rejected';
+        if (data.verificationStatus === 'rejected') return false;
+        // Only show users who have actually uploaded a verification photo
+        if (!isHttpUrl(data.verificationPhoto)) return false;
+        return true;
       })
       .map(d => ({
         id: d.id,
         displayName: d.data().displayName || d.data().name || 'Unknown',
         phoneNumber: d.data().phoneNumber || 'N/A',
         age: d.data().age,
-        verificationPhoto: isHttpUrl(d.data().verificationPhoto) ? d.data().verificationPhoto : undefined,
+        verificationPhoto: d.data().verificationPhoto,
         verificationStatus: d.data().verificationStatus,
         createdAt: d.data().createdAt,
       }));
