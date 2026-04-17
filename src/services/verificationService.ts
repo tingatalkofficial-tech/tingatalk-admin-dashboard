@@ -1,6 +1,9 @@
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 
+const isHttpUrl = (val: any): val is string =>
+  typeof val === 'string' && (val.startsWith('http://') || val.startsWith('https://'));
+
 export interface UnverifiedUser {
   id: string;
   displayName: string;
@@ -30,7 +33,7 @@ export const fetchUnverifiedFemales = async (): Promise<UnverifiedUser[]> => {
         displayName: d.data().displayName || d.data().name || 'Unknown',
         phoneNumber: d.data().phoneNumber || 'N/A',
         age: d.data().age,
-        verificationPhoto: d.data().verificationPhoto,
+        verificationPhoto: isHttpUrl(d.data().verificationPhoto) ? d.data().verificationPhoto : undefined,
         verificationStatus: d.data().verificationStatus,
         createdAt: d.data().createdAt,
       }));
@@ -61,6 +64,7 @@ export const rejectUser = async (userId: string): Promise<void> => {
   try {
     const userRef = doc(db, 'users', userId);
     await updateDoc(userRef, {
+      isVerified: false,
       verificationStatus: 'rejected',
     });
     console.log(`User ${userId} rejected`);

@@ -17,7 +17,8 @@ export const fetchAllUsers = async (): Promise<User[]> => {
         age: data.age,
         createdAt: data.createdAt,
         phoneNumber: data.phoneNumber,
-        profileImage: isHttpUrl(data.profilePhotoUrl) ? data.profilePhotoUrl
+        profileImage: isHttpUrl(data.verificationPhoto) ? data.verificationPhoto
+          : isHttpUrl(data.profilePhotoUrl) ? data.profilePhotoUrl
           : isHttpUrl(data.avatarUrl) ? data.avatarUrl
           : undefined,
         isOnline: data.isOnline || false,
@@ -53,7 +54,8 @@ export const fetchUserDetail = async (userId: string): Promise<UserDetail> => {
       age: rawData.age,
       createdAt: rawData.createdAt,
       phoneNumber: rawData.phoneNumber,
-      profileImage: isHttpUrl(rawData.profilePhotoUrl) ? rawData.profilePhotoUrl
+      profileImage: isHttpUrl(rawData.verificationPhoto) ? rawData.verificationPhoto
+        : isHttpUrl(rawData.profilePhotoUrl) ? rawData.profilePhotoUrl
         : isHttpUrl(rawData.avatarUrl) ? rawData.avatarUrl
         : undefined,
       verificationPhoto: isHttpUrl(rawData.verificationPhoto) ? rawData.verificationPhoto : undefined,
